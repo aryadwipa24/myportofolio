@@ -12,6 +12,7 @@
     --line: #6580b0;
     --text-muted: #dae9fc;
     --radius: 12px;
+    --navbar: linear-gradient(240deg, #919be8, #4755a1, #365699);
 }
 
 body {
@@ -29,13 +30,14 @@ h1, .brand {
     max-width: 960px;
     margin: 0 auto;
     padding: 0 1.5rem;
+
 }
 
 .site-header {
     border-bottom: 3px solid var(--line);
     position: sticky;
     top: 0;
-    background: linear-gradient(240deg, #919be8, #4755a1, #365699);
+    background: var(--navbar);
     z-index: 1000;
 }
 
@@ -44,6 +46,64 @@ h1, .brand {
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 1.5rem;
+}
+
+.brand {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.site-header nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.site-header nav a {
+    color: var(--ink);
+}
+
+.site-header nav li {
+    position: relative;
+    list-style: none;
+}
+
+.site-header nav .section-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: 0.2s;
+}
+
+.site-header nav .section-navbar:hover {
+    background: var(--line);
+}
+
+.site-header nav ul li ul.dropdown{
+    display: none;
+    position: absolute;
+    background: var(--navbar);
+    border-radius: var(--radius);
+    border: 1px solid #d0d7de;
+    width: 125px;
+}
+
+.site-header nav ul li ul.dropdown li a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--ink);
+    text-decoration: none;
+
+}
+
+.site-header nav ul li ul.dropdown li a:hover {
+    background: var(--line);
+    border-radius: var(--radius);
+}
+
+.site-header nav ul li:hover ul.dropdown {
+    display: block;
 }
 
 .brand {
