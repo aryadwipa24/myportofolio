@@ -20,6 +20,7 @@ body {
     color: var(--ink);
     background: var(--paper);
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 h1, .brand {
@@ -30,7 +31,6 @@ h1, .brand {
     max-width: 960px;
     margin: 0 auto;
     padding: 0 1.5rem;
-
 }
 
 .site-header {
@@ -266,6 +266,17 @@ h1, .brand {
     transition: 0.2s;
 }
 
+.empty-state {
+    background-color: #79906d27;
+    border-radius: var(--radius); 
+    border: 2px solid #d0d7de;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
 .list-default li:hover {
     background-color: #5682bc;
     transform: scale(1.05);
@@ -282,7 +293,7 @@ h1, .brand {
     width: 150px;
 }
 
-.skill-list span {
+.list-default span {
     text-align: center;
     max-width: 100%;
     word-wrap: break-word;
@@ -296,7 +307,7 @@ h1, .brand {
 }
 
 .education-list li {
-    width: auto;
+    width: 100%;
 }
 
 .education-info {
@@ -307,6 +318,61 @@ h1, .brand {
     padding: 1.5rem;
     color: var(--text-muted);
     font-size: 0.85rem;
+}
+
+.experience-section {
+    padding: 4rem 0;
+    border-top: 1px solid var(--line);
+}
+
+.section-kicker {
+    color: var(--accent-dark);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.experience-section h1 {
+    margin: 0.4rem 0 1.5rem;
+    font-size: 2rem;
+}
+
+.experience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    background-color: #65e42127;
+}
+
+.experience-card {
+    padding: 1.25rem;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.experience-category {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.experience-card h2 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+}
+
+.experience-description,
+.empty-state {
+    color: var(--text-muted);
+}
+
+.experience-status {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 @media (max-width: 600px) {
