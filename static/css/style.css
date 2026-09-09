@@ -342,14 +342,20 @@ h1, .brand {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1rem;
-    background-color: #65e42127;
 }
 
 .experience-card {
     padding: 1.25rem;
-    background-color: #fff;
-    border: 1px solid var(--line);
+    background-color: #79906d27;
+    border: 2px solid #d0d7de;
     border-radius: var(--radius);
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.experience-card:hover {
+    background-color: #5682bc;
+    transform: scale(1.05);
 }
 
 .experience-category {
@@ -364,8 +370,7 @@ h1, .brand {
     font-size: 1.25rem;
 }
 
-.experience-description,
-.empty-state {
+.experience-description {
     color: var(--text-muted);
 }
 
