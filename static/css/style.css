@@ -275,6 +275,12 @@ h1, .brand {
     align-items: center;
     justify-content: center;
     min-height: 200px;
+    transition: 0.2s;
+}
+
+.empty-state:hover {
+    background-color: #5682bc;
+    transform: scale(1.05);
 }
 
 .list-default li:hover {

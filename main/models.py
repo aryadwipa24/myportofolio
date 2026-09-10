@@ -24,3 +24,18 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class Skill(models.Model):
+    SKILL_CHOICES = [
+        ('programming', 'Programming Language'),
+        ('tools', 'Tools & Software'),
+        ('language', 'Foreign Language'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    category = models.CharField(max_length=20, choices=SKILL_CHOICES, default='programmming')
+    image = models.CharField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
