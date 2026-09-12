@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill - {{ name }}</title>
+    <title>Education - {{ name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <a href="#profile" class="brand">{{ name }}</a>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
             <nav>
                 <ul>
                     <li>
@@ -20,8 +20,8 @@
                         <ul class="dropdown">
                             <li><a href="{% url 'main:show_main' %}">Profile</a></li>
                             <li><a href="{% url 'main:show_experience' %}">Experience</a></li>
-                            <li><a href="#skill">Skill</a></li>
-                            <li><a href="#education">Education</a></li>
+                            <li><a href="{% url 'main:show_skill' %}">Skill</a></li>
+                            <li><a href="{% url 'main:show_education' %}">Education</a></li>
                         </ul>
                     </li>
                 </ul>

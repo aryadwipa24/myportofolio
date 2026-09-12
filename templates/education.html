@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill - {{ name }}</title>
+    <title>Education - {{ name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -31,24 +31,26 @@
 
     <main>
 
-        <section class="border-line skill-section" id="skill">
-            <div class="container">
-                <h2 class="title">My Skills</h2>
+        <section class="border-line education-section" id="education">
+            <div class="container education-grid">
+                <h2 class="title">My Educations</h2>
                 
-                <ul class="list-default skill-list">
-                    {% for skill in skill_list %}
+                <ul class="list-default education-list">
+                    {% for education in education_list %}
                         <li>
-                            <img src="{{ skill.image }}" alt="Photo of {{ skill.title }}">
-                            <span>{{ skill.title }}</span>
+                            <img src="{{ education.image }}" alt="Photo of {{ skill.title }}">
+                            <div class="education-info">
+                                <h3>{{ education.title }}</h3>
+                                <span>{{ education.start|date:"F Y" }} - {{ education.ended }}</span>
+                            </div>
                         </li>
                         {% empty %}
                         <div class="empty-state">
-                            <h3>Belum ada skill yang ditambahkan.</h3>
+                            <h3>Belum ada pendidikan yang ditambahkan.</h3>
                         </div>
                         {% endfor %}
                 </ul>
             </div>
-        </section>
 
     </main>
 

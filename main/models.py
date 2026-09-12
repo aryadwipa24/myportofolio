@@ -39,3 +39,28 @@ class Skill(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Education(models.Model):
+    EDUCATION_CHOICES = [
+        ('pendidikan', 'Pendidikan'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    category = models.CharField(max_length=20, choices=EDUCATION_CHOICES, default='pendidikan')
+    image = models.CharField(blank=True, null=True)
+    start = models.DateField()
+    end = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def is_ongoing(self):
+        return self.end is None
+
+    @property
+    def ended(self):
+        if self.is_ongoing:
+            return "Present"
+        return self.end.strftime("%B %Y")
