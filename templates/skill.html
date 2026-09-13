@@ -38,7 +38,7 @@
                 <ul class="list-default skill-list">
                     {% for skill in skill_list %}
                         <li>
-                            <img src="{{ skill.image }}" alt="Photo of {{ skill.title }}">
+                            <img src="{{ skill.image.url }}" alt="Photo of {{ skill.title }}">
                             <span>{{ skill.title }}</span>
                         </li>
                         {% empty %}

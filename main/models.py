@@ -35,7 +35,7 @@ class Skill(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=20, choices=SKILL_CHOICES, default='programmming')
-    image = models.CharField(blank=True, null=True)
+    image = models.ImageField(upload_to='skills/', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -48,7 +48,7 @@ class Education(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=20, choices=EDUCATION_CHOICES, default='pendidikan')
-    image = models.CharField(blank=True, null=True)
+    image = models.ImageField(upload_to='educations/', blank=True, null=True)
     start = models.DateField()
     end = models.DateField(blank=True, null=True)
 

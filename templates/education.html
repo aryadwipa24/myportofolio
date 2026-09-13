@@ -38,7 +38,7 @@
                 <ul class="list-default education-list">
                     {% for education in education_list %}
                         <li>
-                            <img src="{{ education.image }}" alt="Photo of {{ skill.title }}">
+                            <img src="{{ education.image.url }}" alt="Photo of {{ education.title }}">
                             <div class="education-info">
                                 <h3>{{ education.title }}</h3>
                                 <span>{{ education.start|date:"F Y" }} - {{ education.ended }}</span>
