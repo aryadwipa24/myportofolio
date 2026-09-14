@@ -1,33 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education - {{ name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-            <nav>
-                <ul>
-                    <li>
-                        <a class="section-navbar" href="#">Section List ▾</a>
-                        <ul class="dropdown">
-                            <li><a href="{% url 'main:show_main' %}">Profile</a></li>
-                            <li><a href="{% url 'main:show_experience' %}">Experience</a></li>
-                            <li><a href="{% url 'main:show_skill' %}">Skill</a></li>
-                            <li><a href="{% url 'main:show_education' %}">Education</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+{% extends 'base.html' %}
+{% block meta %}
+    <title>Experience - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
 
 <main>
     <section class="experience-section" id="experience">
@@ -61,10 +36,4 @@
     </section>
 </main>
 
-    <footer class="border-line site-footer">
-        <div class="container">
-            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-        </div>
-    </footer>
-</body>
-</html>
+{% endblock content %}

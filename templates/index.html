@@ -1,71 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ name }} - Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-            <nav>
-                <ul>
-                    <li>
-                        <a class="section-navbar" href="#">Section List ▾</a>
-                        <ul class="dropdown">
-                            <li><a href="{% url 'main:show_main' %}">Profile</a></li>
-                            <li><a href="{% url 'main:show_experience' %}">Experience</a></li>
-                            <li><a href="{% url 'main:show_skill' %}">Skill</a></li>
-                            <li><a href="{% url 'main:show_education' %}">Education</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+{% extends 'base.html' %}
+{% block meta %}
+    <title>Portofolio - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
 
-    <main>
-        <section class="hero" id="profile">
-            <div class="container hero-grid">
-                <div class="hero-identity">
-                    <p class="hero-kicker">Computer Science &middot; Universitas Indonesia</p>
-                    <h1>Arya Dwipa Wicaksana</h1>
-                </div>
-                <div class="hero-photo">
-                    <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/Arya.jpg" alt="Photo of {{ name }}">
-                </div>
-                <div class="hero-details">
-                    <p class="bio">{{ bio }}</p>
-                    <dl class="meta-list">
-                        <div class="meta-row">
-                            <dt>NPM</dt>
-                            <dd>{{ npm }}</dd>
-                        </div>
-                        <div class="meta-row">
-                            <dt>Program</dt>
-                            <dd>{{ study_program }}</dd>
-                        </div>
-                    </dl>
-                    <div class="social-links">
-                        <a href="https://github.com/SpeedySekai" target="_blank" class="social-link">GitHub</a>
-                        <a href="https://www.linkedin.com/in/arya-dwipa-wicaksana-2b79a937b/" class="social-link" target="_blank">LinkedIn</a>
-                        <a href="mailto:aryadwipa3112@gmail.com" class="social-link">Email</a>
+<main>
+    <section class="hero" id="profile">
+        <div class="container hero-grid">
+            <div class="hero-identity">
+                <p class="hero-kicker">Computer Science &middot; Universitas Indonesia</p>
+                <h1>Arya Dwipa Wicaksana</h1>
+            </div>
+            <div class="hero-photo">
+                <div class="photo-block"></div>
+                <img class="avatar" src="/static/img/Arya.jpg" alt="Photo of {{ name }}">
+            </div>
+            <div class="hero-details">
+                <p class="bio">{{ bio }}</p>
+                <dl class="meta-list">
+                    <div class="meta-row">
+                        <dt>NPM</dt>
+                        <dd>{{ npm }}</dd>
                     </div>
+                    <div class="meta-row">
+                        <dt>Program</dt>
+                        <dd>{{ study_program }}</dd>
+                    </div>
+                </dl>
+                <div class="social-links">
+                    <a href="https://github.com/SpeedySekai" target="_blank" class="social-link">GitHub</a>
+                    <a href="https://www.linkedin.com/in/arya-dwipa-wicaksana-2b79a937b/" class="social-link" target="_blank">LinkedIn</a>
+                    <a href="mailto:aryadwipa3112@gmail.com" class="social-link">Email</a>
                 </div>
             </div>
-        </section>
-    </main>
-
-    <footer class="border-line site-footer">
-        <div class="container">
-            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
-    </footer>
-</body>
-</html>
+    </section>
+</main>
+
+{% endblock content %}
