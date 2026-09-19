@@ -1,6 +1,6 @@
-from django.forms import ModelForm, TextInput, Textarea, URLInput
-
-from main.models import Project
+from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput, ClearableFileInput
+from django import forms
+from main.models import Project, Education
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -50,3 +50,48 @@ class ProjectForm(ModelForm):
                 }
             ),
         }
+
+class EducationForm(ModelForm):
+    class Meta:
+        model = Education
+        fields = [
+            "title",
+            "start",
+            "end",
+            "image",
+        ]
+
+        labels = {
+            "title": "Nama Institusi Pendidikan",
+            "start": "Tahun Memulai",
+            "end": "Tahun Selesai (Jika Masih Berlangsung Kosongkan Saja)",
+            "image": "Foto Lambang Institusi Pendidikan (Opsional)",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Nama Institusi Pnedidikan",
+                    "maxlength": 255,
+                }
+            ),
+            'start': forms.DateInput(
+                format='%Y-%m',
+                attrs={'type': 'month', 'class': 'form-control'}
+            ),
+            'end': forms.DateInput(
+                format='%Y-%m',
+                attrs={'type': 'month', 'class': 'form-control'}
+            ),
+            "image": forms.FileInput(
+                attrs={
+                    "accept": "image/*",
+                    "class": "form-control",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start'].input_formats = ['%Y-%m', '%Y-%m-%d']
+        self.fields['end'].input_formats = ['%Y-%m', '%Y-%m-%d']

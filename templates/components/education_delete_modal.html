@@ -1,0 +1,41 @@
+<div id="delete-education" class="component-delete-modal" popover="auto">
+    <button type="button"
+            class="component-delete-modal__backdrop"
+            popovertarget="delete-education"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="component-delete-modal__content">
+        <button type="button"
+                class="component-delete-modal__close"
+                popovertarget="delete-education"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        
+        <h2>Centang Riwayat Pendidikan yang Ingin Dihapus</h2>
+        
+        <form method="post" action="{% url 'main:delete_education' %}">
+            {% csrf_token %}
+            <div class="delete-checkbox-list">
+                {% for education in education_list %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" 
+                               id="edu-{{ education.id }}" 
+                               name="selected_educations" 
+                               value="{{ education.id }}">
+                        <label for="edu-{{ education.id }}">{{ education.title }}</label>
+                    </div>
+                {% empty %}
+                    <p>Tidak ada data untuk dihapus.</p>
+                {% endfor %}
+            </div>
+
+            <div class="component-delete-modal__actions">
+                <button type="button"
+                class="button button-secondary"
+                popovertarget="delete-education"
+                popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>

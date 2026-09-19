@@ -8,11 +8,30 @@
     <section class="border-line education-section" id="education">
         <div class="container education-grid">
             <h2 class="title">My Educations</h2>
-            
+            <div class="actions-button">
+                <a href="{% url 'main:create_education' %}"
+                    class="button education-add-button">
+                    <span aria-hidden="true">+</span>
+                    Tambah Riwayat Pendidikan
+                </a>
+
+                {% if education_list %}
+                <button type="button" class="button button-secondary" popovertarget="edit-education-modal">
+                    Edit Riwayat Pendidikan
+                </button>
+
+                <button type="button" class="button button-danger" popovertarget="delete-education">
+                    Hapus Riwayat Pendidikan
+                </button>
+                {% endif %}
+            </div>
+
             <ul class="list-default education-list">
                 {% for education in education_list %}
                     <li>
-                        <img src="{{ education.image.url }}" alt="Photo of {{ education.title }}">
+                        {% if education.image %}
+                            <img src="{{ education.image.url }}" alt="Photo of {{ education.title }}">
+                        {% endif %}                        
                         <div class="education-info">
                             <h3>{{ education.title }}</h3>
                             <span>{{ education.start|date:"F Y" }} - {{ education.ended }}</span>
@@ -25,6 +44,10 @@
                     {% endfor %}
             </ul>
         </div>
+    </section>
+
+    {% include "components/education_edit_modal.html" %}
+    {% include "components/education_delete_modal.html" %}
 </main>
 
 {% endblock content %}

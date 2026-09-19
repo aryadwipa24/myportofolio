@@ -3,7 +3,7 @@ from main.models import Experience, Skill, Education, Project
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
-from main.forms import ProjectForm
+from main.forms import ProjectForm, EducationForm
 
 def show_main(request):
     context = {
@@ -34,11 +34,74 @@ def show_skill(request):
     return render(request, "skill.html", context)
 
 def show_education(request):
+    json_response = get_education_json(request)
+
+    educations = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    educations = [education.object for education in educations]
+    educations = sorted(educations, key=lambda x: x.start, reverse=True)
+    title_query = request.GET.get("title", "").strip()
+
     context = {
         "name": "Arya Dwipa Wicaksana",
-        "education_list": Education.objects.all(),
+        "education_list": educations,
+        "title_query": title_query,
     }
     return render(request, "education.html", context)
+
+def create_education(request):
+    form = EducationForm(request.POST or None, request.FILES)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Pendidikan baru berhasil ditambahkan!")
+        return redirect("main:show_education")
+
+    context = {
+        "name": "Arya Dwipa Wicaksana",
+        "form": form,
+    }
+    return render(request, "education_form.html", context)
+
+def delete_education(request):
+    education_ids = request.POST.getlist("selected_educations")
+
+    if request.method == "POST":
+        Education.objects.filter(id__in=education_ids).delete()
+        messages.success(request, f"{len(education_ids)} riwayat pendidikan berhasil dihapus!")
+        return redirect("main:show_education")
+
+    return redirect("main:show_education")
+
+def get_education_json(request):
+    title_query = request.GET.get("title", "").strip()
+    education = Education.objects.all()
+
+    if title_query:
+        education = education.filter(title__icontains=title_query)
+
+    education_json = serializers.serialize("json", education)
+    return HttpResponse(education_json, content_type="application/json")
+
+def edit_education(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+    form = EducationForm(request.POST or None, request.FILES, instance=education)
+
+    if request.method == "POST" and form.is_valid():
+            form.save()
+            messages.success(request, "Pendidikan berhasil diperbarui!")
+            return redirect("main:show_education")
+    else:
+        form = EducationForm(instance=education)
+
+    context = {
+            "name": "Arya Dwipa Wicaksana",
+            "form": form,
+            'education': education
+        }
+    return render(request, "education_edit_form.html", context)
 
 def create_project(request):
     form = ProjectForm(request.POST or None)

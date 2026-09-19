@@ -1,0 +1,4 @@
+.skill-list li {
+    flex-direction: column;
+    width: 150px;
+}

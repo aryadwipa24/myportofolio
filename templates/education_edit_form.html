@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main>
+    <section class="education-section">
+        <div class="container">
+            <h1>Edit Education</h1>
+            <form method="post"
+                  action="{% url 'main:edit_education' education.id %}"
+                  class="education-form"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        
+                        {% if field.name == 'image' %}
+                            {% if education.image %}
+                            <div class="preview">
+                                <p>Foto Saat Ini:</p>
+                                <img src="{{ education.image.url }}" alt="Preview" class="image">
+
+                                <div class="clear-checkbox-group">
+                                    <input type="checkbox" name="image-clear" id="image-clear_id">
+                                    <label for="image-clear_id">Hapus foto saat ini</label>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {{ field }}
+                        
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="button">Simpan Perubahan</button>
+                <a href="{% url 'main:show_education' %}" class="button button-secondary">Batal</a>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock content %}

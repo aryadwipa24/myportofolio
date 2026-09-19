@@ -1,0 +1,16 @@
+.education-list {
+    flex-direction: column;
+}
+
+.education-list li {
+    width: 100%;
+}
+
+.education-info {
+    padding-left: 15px;
+}
+
+.education-section {
+    padding: 4rem 0;
+}
+
