@@ -1,9 +1,33 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from main.models import Experience, Skill, Education, Project
 from django.contrib import messages
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from main.forms import ProjectForm, EducationForm
+from functools import wraps
+
+SECRET_KEY = os.getenv("SECRET_API_KEY", "HewanHewanApaYangSatuKata?")
+
+def require_secret_key(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.method == 'GET':
+            return view_func(request, *args, **kwargs)
+        
+        header_key = request.META.get("HTTP_X_SECRET_KEY")
+        form_key = request.POST.get("secret_password")
+
+        if header_key == SECRET_KEY or form_key == SECRET_KEY:
+            return view_func(request, *args, **kwargs)
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'api' in request.path:
+            return JsonResponse({'error': 'Unauthorized: Kode rahasia salah/tidak ada!'}, status=403)
+
+        messages.error(request, "Password salah!")
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+    return _wrapped_view
 
 def show_main(request):
     context = {
@@ -51,6 +75,7 @@ def show_education(request):
     }
     return render(request, "education.html", context)
 
+@require_secret_key
 def create_education(request):
     form = EducationForm(request.POST or None, request.FILES)
 
@@ -65,6 +90,7 @@ def create_education(request):
     }
     return render(request, "education_form.html", context)
 
+@require_secret_key
 def delete_education(request):
     education_ids = request.POST.getlist("selected_educations")
 
@@ -85,6 +111,7 @@ def get_education_json(request):
     education_json = serializers.serialize("json", education)
     return HttpResponse(education_json, content_type="application/json")
 
+@require_secret_key
 def edit_education(request, education_id):
     education = get_object_or_404(Education, pk=education_id)
     form = EducationForm(request.POST or None, request.FILES, instance=education)
@@ -103,6 +130,7 @@ def edit_education(request, education_id):
         }
     return render(request, "education_edit_form.html", context)
 
+@require_secret_key
 def create_project(request):
     form = ProjectForm(request.POST or None)
 
@@ -117,6 +145,7 @@ def create_project(request):
     }
     return render(request, "projects_form.html", context)
 
+@require_secret_key
 def delete_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 

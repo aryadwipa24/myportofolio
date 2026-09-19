@@ -30,13 +30,15 @@
             <strong>{{ project.title }}</strong>?
         </p>
         <div class="component-delete-modal__actions">
-            <button type="button"
+            
+            <form method="post" action="{% url 'main:delete_project' project.id %}">
+                {% csrf_token %}
+                {% include 'components/password.html' %}
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+                <button type="button"
                     class="button button-secondary"
                     popovertarget="delete-project-{{ project.id }}"
                     popovertargetaction="hide">Batal</button>
-            <form method="post" action="{% url 'main:delete_project' project.id %}">
-                {% csrf_token %}
-                <button type="submit" class="button button-danger">Ya, Hapus</button>
             </form>
         </div>
     </div>

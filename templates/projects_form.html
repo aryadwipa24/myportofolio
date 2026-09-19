@@ -11,6 +11,7 @@
                       action="{% url 'main:create_project' %}"
                       class="project-form">
                     {% csrf_token %}
+                    {% include 'components/password.html' %}
                     {% for field in form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
