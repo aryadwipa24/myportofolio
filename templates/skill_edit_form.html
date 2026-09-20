@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block meta %}
-    <title>Edit Education - {{ name }}</title>
+    <title>Edit Skill - {{ name }}</title>
 {% endblock meta %}
 {% block content %}
 <main>
-    <section class="education-section">
+    <section class="skill-section">
         <div class="container">
-            <h1>Edit Education</h1>
+            <h1>Edit Skill</h1>
             <form method="post"
-                  action="{% url 'main:edit_education' education.id %}"
-                  class="education-form"
+                  action="{% url 'main:edit_skill' skill.id %}"
+                  class="skill-form"
                   enctype="multipart/form-data">
                 {% csrf_token %}
                 {% include 'components/password.html' %}
@@ -18,10 +18,10 @@
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         
                         {% if field.name == 'image' %}
-                            {% if education.image %}
+                            {% if skill.image %}
                             <div class="preview">
                                 <p>Foto Saat Ini:</p>
-                                <img src="{{ education.image.url }}" alt="Preview" class="image">
+                                <img src="{{ skill.image.url }}" alt="Preview" class="image">
 
                                 <div class="clear-checkbox-group">
                                     <input type="checkbox" name="image-clear" id="image-clear_id">
@@ -31,7 +31,6 @@
                             {% endif %}
 
                             {{ field }}
-                        
                         {% else %}
                             {{ field }}
                         {% endif %}
@@ -42,7 +41,7 @@
                     </div>
                 {% endfor %}
                 <button type="submit" class="button">Simpan Perubahan</button>
-                <a href="{% url 'main:show_education' %}" class="button button-secondary">Batal</a>
+                <a href="{% url 'main:show_skill' %}" class="button button-secondary">Batal</a>
             </form>
         </div>
     </section>

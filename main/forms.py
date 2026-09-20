@@ -1,6 +1,6 @@
 from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput, ClearableFileInput
 from django import forms
-from main.models import Project, Education
+from main.models import Project, Education, Skill, Experience
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -77,16 +77,15 @@ class EducationForm(ModelForm):
             ),
             'start': forms.DateInput(
                 format='%Y-%m',
-                attrs={'type': 'month', 'class': 'form-control'}
+                attrs={'type': 'month',}
             ),
             'end': forms.DateInput(
                 format='%Y-%m',
-                attrs={'type': 'month', 'class': 'form-control'}
+                attrs={'type': 'month',}
             ),
             "image": forms.FileInput(
                 attrs={
                     "accept": "image/*",
-                    "class": "form-control",
                 }
             ),
         }
@@ -95,3 +94,35 @@ class EducationForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['start'].input_formats = ['%Y-%m', '%Y-%m-%d']
         self.fields['end'].input_formats = ['%Y-%m', '%Y-%m-%d']
+
+class SkillForm(ModelForm):
+    class Meta:
+        model = Skill
+        fields = [
+            "title",
+            "category",
+            "image",
+        ]
+
+        labels = {
+            "title": "Nama Skill",
+            "category": "Bidang Skill",
+            "image": "Foto Skill (Opsional)",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Nama Skill",
+                    "maxlength": 255,
+                }
+            ),
+            'category': forms.Select(
+                choices=Skill.SKILL_CHOICES,
+            ),
+            "image": forms.FileInput(
+                attrs={
+                    "accept": "image/*",
+                }
+            ),
+        }

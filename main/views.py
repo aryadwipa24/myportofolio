@@ -4,7 +4,7 @@ from main.models import Experience, Skill, Education, Project
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
-from main.forms import ProjectForm, EducationForm
+from main.forms import ProjectForm, EducationForm, SkillForm
 from functools import wraps
 
 SECRET_KEY = os.getenv("SECRET_API_KEY", "HewanHewanApaYangSatuKata?")
@@ -22,7 +22,7 @@ def require_secret_key(view_func):
             return view_func(request, *args, **kwargs)
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'api' in request.path:
-            return JsonResponse({'error': 'Unauthorized: Kode rahasia salah/tidak ada!'}, status=403)
+            return JsonResponse({'error': 'Password salah!'}, status=403)
 
         messages.error(request, "Password salah!")
         return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -51,11 +51,82 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_skill(request):
+    json_response = get_skill_json(request)
+    
+    skills = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    skills = [skill.object for skill in skills]
+    order = ["programming", "tools", "language"]
+    skills = sorted(skills, key=lambda x: order.index(x.category) if x.category in order else 99)
+    title_query = request.GET.get("title", "").strip()
+
     context = {
         "name": "Arya Dwipa Wicaksana",
-        "skill_list": Skill.objects.all(),
+        "skill_list": skills,
+        "title_query": title_query,
     }
     return render(request, "skill.html", context)
+
+@require_secret_key
+def create_skill(request):
+    form = SkillForm(request.POST or None, request.FILES)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Skill baru berhasil ditambahkan!")
+        return redirect("main:show_skill")
+
+    context = {
+        "name": "Arya Dwipa Wicaksana",
+        "form": form,
+    }
+    return render(request, "skill_form.html", context)
+
+@require_secret_key
+def delete_skill(request):
+    skill_ids = request.POST.getlist("selected_skills")
+
+    if request.method == "POST":
+        Skill.objects.filter(id__in=skill_ids).delete()
+        messages.success(request, f"{len(skill_ids)} skill berhasil dihapus!")
+        return redirect("main:show_skill")
+
+    return redirect("main:show_skill")
+
+def get_skill_json(request):
+    title_query = request.GET.get("title", "").strip()
+    skill = Skill.objects.all()
+
+    if title_query:
+        skill = skill.filter(title__icontains=title_query)
+
+    skill_json = serializers.serialize("json", skill)
+    return HttpResponse(skill_json, content_type="application/json")
+
+@require_secret_key
+def edit_skill(request, skill_id):
+    skill = get_object_or_404(Skill, pk=skill_id)
+    form = SkillForm(request.POST or None, request.FILES, instance=skill)
+
+    if request.method == "POST" and form.is_valid():
+        if request.POST.get("image-clear"):
+            if skill.image:
+                skill.image.delete(save=False)
+            skill.image = None
+        form.save()
+        messages.success(request, "Skill berhasil diperbarui!")
+        return redirect("main:show_skill")
+    else:
+        form = SkillForm(instance=skill)
+
+    context = {
+            "name": "Arya Dwipa Wicaksana",
+            "form": form,
+            'skill': skill
+        }
+    return render(request, "skill_edit_form.html", context)
 
 def show_education(request):
     json_response = get_education_json(request)
@@ -117,9 +188,13 @@ def edit_education(request, education_id):
     form = EducationForm(request.POST or None, request.FILES, instance=education)
 
     if request.method == "POST" and form.is_valid():
-            form.save()
-            messages.success(request, "Pendidikan berhasil diperbarui!")
-            return redirect("main:show_education")
+        if request.POST.get("image-clear"):
+            if education.image:
+                education.image.delete(save=False)
+            education.image = None
+        form.save()
+        messages.success(request, "Pendidikan berhasil diperbarui!")
+        return redirect("main:show_education")
     else:
         form = EducationForm(instance=education)
 
