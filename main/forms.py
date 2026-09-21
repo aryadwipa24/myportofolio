@@ -126,3 +126,66 @@ class SkillForm(ModelForm):
                 }
             ),
         }
+
+class ExperienceForm(ModelForm):
+    class Meta:
+        model = Experience
+        fields = [
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "started_at",
+            "ended_at",
+        ]
+
+        labels = {
+            "title": "Nama Pengalaman",
+            "description": "Deskripsi Pengalaman",
+            "category": "Kategori Pengalaman",
+            "thumbnail": "URL Gambar Pengalaman (Opsional)",
+            "started_at": "Tanggal Mulai",
+            "ended_at": "Tanggal Selesai (Opsional)",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Nama Pengalaman",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Ceritakan Pengalaman",
+                    "rows": 3,
+                }
+            ),
+            'category': forms.Select(
+                choices=Experience.EXPERIENCE_CHOICES,
+            ),
+            "thumbnail": URLInput(
+                attrs={
+                    "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
+                }
+            ),
+            "started_at": forms.DateTimeInput(
+                attrs={
+                    "type": "date"
+                },
+                format="%Y-%m-%d",
+            ),
+            "ended_at": forms.DateTimeInput(
+                attrs={
+                    "type": "date"
+                },
+                format="%Y-%m-%d",
+            ),            
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            if self.instance.started_at:
+                self.fields['started_at'].widget.format = '%Y-%m-%d'
+            if self.instance.ended_at:
+                self.fields['ended_at'].widget.format = '%Y-%m-%d'

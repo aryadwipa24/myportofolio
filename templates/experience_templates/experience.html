@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block meta %}
+    <title>Experience - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
+
+<main>
+    <section class="experience-section" id="experience">
+        <div class="container container-exp">
+            <p class="section-kicker">Perjalanan saya sejauh ini</p>
+            <h1>Experience</h1>
+
+            <div class="actions-button">
+                <a href="{% url 'main:create_experience' %}"
+                    class="button experience-add-button">
+                    <span aria-hidden="true">+</span>
+                    Tambah Experience
+                </a>
+
+                {% if experience_list %}
+                <button type="button" class="button button-secondary" popovertarget="edit-experience-modal">
+                    Edit Experience
+                </button>
+
+                <button type="button" class="button button-danger" popovertarget="delete-experience">
+                    Hapus Experience
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="experience-grid">
+                {% for experience in experience_list %}
+                    <article class="experience-card">
+                        <span class="experience-category">
+                            {{ experience.get_category_display }}
+                        </span>
+                        <h2>{{ experience.title }}</h2>
+                        
+                        <div class="experience-body">
+                            {% if experience.thumbnail %}
+                                <img src="{{ experience.thumbnail }}"
+                                        alt="Gambar {{ experience.title }}"
+                                        class="experience-image">
+                            {% endif %}
+                            <div class="experience-details">
+                                <p class="experience-description">
+                                    {{ experience.description }}
+                                </p>
+                                {% if experience.is_ongoing %}
+                                    <p class="experience-status">{{ experience.started_at|date:"d M Y" }} - Present</p>
+                                {% else %}
+                                    <p class="experience-status">{{ experience.started_at|date:"d M Y" }} - {{ experience.ended_at|date:"d M Y" }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <h2>Belum ada pengalaman yang ditambahkan.</h2>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {% include "components/experience_modal.html" %}
+</main>
+
+{% endblock content %}

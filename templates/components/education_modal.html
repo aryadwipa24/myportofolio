@@ -1,12 +1,12 @@
-<div id="delete-education" class="component-delete-modal" popover="auto">
+<div id="delete-education" class="component-modal" popover="auto">
     <button type="button"
-            class="component-delete-modal__backdrop"
+            class="component-modal__backdrop"
             popovertarget="delete-education"
             popovertargetaction="hide"
             aria-label="Tutup konfirmasi hapus"></button>
-    <div class="component-delete-modal__content">
+    <div class="component-modal__content">
         <button type="button"
-                class="component-delete-modal__close"
+                class="component-modal__close"
                 popovertarget="delete-education"
                 popovertargetaction="hide"
                 aria-label="Tutup konfirmasi hapus">×</button>
@@ -30,7 +30,7 @@
                 {% endfor %}
             </div>
 
-            <div class="component-delete-modal__actions">
+            <div class="component-modal__actions">
                 <button type="button"
                 class="button button-secondary"
                 popovertarget="delete-education"
@@ -38,5 +38,36 @@
                 <button type="submit" class="button button-danger">Ya, Hapus</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div id="edit-education-modal" class="component-modal" popover="auto">
+    <div class="component-modal__content">
+        <button type="button" 
+                class="component-modal__close" 
+                popovertarget="edit-education-modal" 
+                popovertargetaction="hide"
+                aria-label="Tutup modal">×</button>
+        
+        <h2>Pilih Pendidikan yang Ingin Diubah</h2>
+        <p>Klik salah satu untuk mengedit datanya:</p>
+
+        <div class="edit-select-list">
+            {% for education in education_list %}
+                <a href="{% url 'main:edit_education' education.id %}" 
+                   class="button button-secondary">
+                    {{ education.title }}
+                </a>
+            {% empty %}
+                <p>Belum ada data untuk diubah.</p>
+            {% endfor %}
+        </div>
+
+        <div class="component-modal__actions">
+            <button type="button" 
+                    class="button button-secondary" 
+                    popovertarget="edit-education-modal" 
+                    popovertargetaction="hide">Batal</button>
+        </div>
     </div>
 </div>

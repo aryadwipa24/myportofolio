@@ -8,19 +8,19 @@
     </button>
 </p>
 <div id="delete-project-{{ project.id }}"
-     class="component-delete-modal"
+     class="component-modal"
      popover="auto"
      role="dialog"
      aria-modal="true"
      aria-labelledby="delete-project-title-{{ project.id }}">
     <button type="button"
-            class="component-delete-modal__backdrop"
+            class="component-modal__backdrop"
             popovertarget="delete-project-{{ project.id }}"
             popovertargetaction="hide"
             aria-label="Tutup konfirmasi hapus"></button>
-    <div class="component-delete-modal__content">
+    <div class="component-modal__content">
         <button type="button"
-                class="component-delete-modal__close"
+                class="component-modal__close"
                 popovertarget="delete-project-{{ project.id }}"
                 popovertargetaction="hide"
                 aria-label="Tutup konfirmasi hapus">×</button>
@@ -29,7 +29,7 @@
             Apakah Anda yakin ingin menghapus
             <strong>{{ project.title }}</strong>?
         </p>
-        <div class="component-delete-modal__actions">
+        <div class="component-modal__actions">
             
             <form method="post" action="{% url 'main:delete_project' project.id %}">
                 {% csrf_token %}

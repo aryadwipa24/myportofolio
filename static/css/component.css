@@ -1,4 +1,4 @@
-.component-delete-modal {
+.component-modal {
     display: none;
     position: fixed;
     inset: 0;
@@ -15,11 +15,11 @@
     justify-content: center;
 }
 
-.component-delete-modal:popover-open {
+.component-modal:popover-open {
     display: flex;
 }
 
-.component-delete-modal__backdrop {
+.component-modal__backdrop {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -30,7 +30,7 @@
     cursor: default;
 }
 
-.component-delete-modal__content {
+.component-modal__content {
     position: relative;
     z-index: 1;
     width: min(100%, 480px);
@@ -41,7 +41,7 @@
     box-shadow: 0 1rem 3rem rgba(28, 25, 23, 0.22);
 }
 
-.component-delete-modal__content h2 {
+.component-modal__content h2 {
     margin: 0 0 0.75rem;
     font-family:
         "Space Grotesk",
@@ -50,7 +50,7 @@
     font-size: 1.5rem;
 }
 
-.component-delete-modal__close {
+.component-modal__close {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -63,7 +63,7 @@
     cursor: pointer;
 }
 
-.component-delete-modal__actions {
+.component-modal__actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;

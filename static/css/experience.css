@@ -44,3 +44,26 @@
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+.experience-body {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    margin-top: 0.75rem;
+}
+
+.experience-image {
+    width: 200px;
+    height: 140px;
+    object-fit: cover;
+    border: 1px solid black;
+    border-radius: var(--radius);
+    flex-shrink: 0;
+}
+
+.experience-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}

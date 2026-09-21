@@ -4,7 +4,7 @@ from main.models import Experience, Skill, Education, Project
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
-from main.forms import ProjectForm, EducationForm, SkillForm
+from main.forms import ProjectForm, EducationForm, SkillForm, ExperienceForm
 from functools import wraps
 
 SECRET_KEY = os.getenv("SECRET_API_KEY", "HewanHewanApaYangSatuKata?")
@@ -44,11 +44,79 @@ def show_main(request):
 
 
 def show_experience(request):
+    json_response = get_experience_json(request)
+
+    experiences = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8")
+    )
+    experiences = [experience.object for experience in experiences]
+    experiences = sorted(experiences, key=lambda x: x.id)
+    title_query = request.GET.get("title", "").strip()
+
     context = {
         "name": "Arya Dwipa Wicaksana",
-        "experience_list": Experience.objects.all(),
+        "experience_list": experiences,
+        "title_query": title_query,
     }
-    return render(request, "experience.html", context)
+    return render(request, "experience_templates/experience.html", context)
+
+@require_secret_key
+def create_experience(request):
+    form = ExperienceForm(request.POST or None, request.FILES)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Pengalaman baru berhasil ditambahkan!")
+        return redirect("main:show_experience")
+
+    context = {
+        "name": "Arya Dwipa Wicaksana",
+        "form": form,
+    }
+    return render(request, "experience_templates/experience_form.html", context)
+
+@require_secret_key
+def delete_experience(request):
+    experience_ids = request.POST.getlist("selected_experiences")
+
+    if request.method == "POST":
+        Experience.objects.filter(id__in=experience_ids).delete()
+        messages.success(request, f"{len(experience_ids)} pengalaman berhasil dihapus!")
+        return redirect("main:show_experience")
+
+    return redirect("main:show_experience")
+
+def get_experience_json(request):
+    title_query = request.GET.get("title", "").strip()
+    experience = Experience.objects.all()
+
+    if title_query:
+        experience = experience.filter(title__icontains=title_query)
+
+    experience_json = serializers.serialize("json", experience)
+    return HttpResponse(experience_json, content_type="application/json")
+
+@require_secret_key
+def edit_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+    form = ExperienceForm(request.POST or None, request.FILES, instance=experience)
+
+    if request.method == "POST" and form.is_valid():
+        if request.POST.get("image-clear"):
+            experience.thumbnail = None
+        form.save()
+        messages.success(request, "Pengalaman berhasil diperbarui!")
+        return redirect("main:show_experience")
+    else:
+        form = ExperienceForm(instance=experience)
+
+    context = {
+            "name": "Arya Dwipa Wicaksana",
+            "form": form,
+            'experience': experience
+        }
+    return render(request, "experience_templates/experience_edit_form.html", context)
 
 def show_skill(request):
     json_response = get_skill_json(request)
@@ -67,7 +135,7 @@ def show_skill(request):
         "skill_list": skills,
         "title_query": title_query,
     }
-    return render(request, "skill.html", context)
+    return render(request, "skill_templates/skill.html", context)
 
 @require_secret_key
 def create_skill(request):
@@ -82,7 +150,7 @@ def create_skill(request):
         "name": "Arya Dwipa Wicaksana",
         "form": form,
     }
-    return render(request, "skill_form.html", context)
+    return render(request, "skill_templates/skill_form.html", context)
 
 @require_secret_key
 def delete_skill(request):
@@ -126,7 +194,7 @@ def edit_skill(request, skill_id):
             "form": form,
             'skill': skill
         }
-    return render(request, "skill_edit_form.html", context)
+    return render(request, "skill_templates/skill_edit_form.html", context)
 
 def show_education(request):
     json_response = get_education_json(request)
@@ -144,7 +212,7 @@ def show_education(request):
         "education_list": educations,
         "title_query": title_query,
     }
-    return render(request, "education.html", context)
+    return render(request, "education_templates/education.html", context)
 
 @require_secret_key
 def create_education(request):
@@ -159,7 +227,7 @@ def create_education(request):
         "name": "Arya Dwipa Wicaksana",
         "form": form,
     }
-    return render(request, "education_form.html", context)
+    return render(request, "education_templates/education_form.html", context)
 
 @require_secret_key
 def delete_education(request):
@@ -203,7 +271,7 @@ def edit_education(request, education_id):
             "form": form,
             'education': education
         }
-    return render(request, "education_edit_form.html", context)
+    return render(request, "education_templates/education_edit_form.html", context)
 
 @require_secret_key
 def create_project(request):
@@ -218,7 +286,7 @@ def create_project(request):
         "name": "Arya Dwipa Wicaksana",
         "form": form,
     }
-    return render(request, "projects_form.html", context)
+    return render(request, "project_templates/projects_form.html", context)
 
 @require_secret_key
 def delete_project(request, project_id):
@@ -246,7 +314,7 @@ def show_projects(request):
         "project_list": projects,
         "title_query": title_query,
     }
-    return render(request, "project.html", context)
+    return render(request, "project_templates/project.html", context)
 
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()

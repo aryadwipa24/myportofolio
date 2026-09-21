@@ -20,3 +20,14 @@ Saya memakai Gemini untuk membantu mengerjakan  tugas ini sebagai alat bantu men
 
 3. Perbedaan dari makemigrations dan migrate adalah makemigrations baru bertugas membaca perubahan pada model.py dan membuat blueprint baru saja, sedangkan migrate memiliki tugas untuk menjalankan instruksi dari blueprint tersebut dan mengaplikasikan perubahannya ke database.
 Contoh yang menjalankan kedua perintah itu adalah ketika saya menambahkan model baru, mengubah tipe field, menambah atau menghapus atribut/kolom, atau mengubah opsi field fi models.py, setiap kali saya melakukan itu, saya harus menjalankan perintah makemigrations dan migrate agar model dapat digunakan.
+
+### Tugas 3
+Saya memakai Gemini untuk membantu dalam pembuatan bagaimana caranya agar Create, Update, dan Delete hanya bisa diakses untuk yang memiliki password.
+
+1. ModelForm digunakan karena di ModelForm itu udah otomatis membuat field form yang sesuai dengan field yang dibuat di model, sehingga tidak perlu ditulis ulang satu per satu di HTML. Selain itu, ada juga method/fungsi bawaan dari ModelForm yang memudahkan seperti is_valid() yang bisa ngecek kevalidan data atau save() yang berguna untuk pembuatan atau pembaruan data.
+
+csrf_token wajib ditambahkan karena token tersebut menghasilkan token rahasia pada setiap sesi pengguna. Saat form dikirim, Django akan memverifikasi tokennya, jika cocok diterima, jika tidak cocok ditolak.
+
+2. JSON lebih disukai karena file JSON lebih enak dilihat dan mudah dibaca karena berbentuk dictionary yang terdiri dari key-value, tidak seperti XML yang masih menggunakan tag, shingga kalau datanya banyak lebih tidak enak dilihat. Selain itu, JSON juga memiliki size file lebih kecil daripaa XML.
+
+3. Pertama-tama, client mengirimkan request HTTP ke server Django. Setelah itu Django akan menyocokkan URL request dengan route yang sesuai di urls.py dan mengirimkan request tersebut ke view yang sesuai. View akan mengambil data dari database menggunakan Django ORM, seperti objects.all() yang akan mereturn QuerySet yang berisikan instance dari suatu objek. Karena tipe data QuerySet python tidak bisa langsung diubah ke JSON, data ini harus dizerialization dulu ke tipe data primitif python, disinilah zerialization diperlukan untuk mengubahnya menjadi JSON. Setelah dizerialization, data akan direturn ke client dengan header.

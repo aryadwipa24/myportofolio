@@ -168,22 +168,22 @@
         width: 100%;
     }
 
-    .component-delete-modal {
+    .component-modal {
         align-items: flex-end;
         padding: 0;
     }
 
-    .component-delete-modal__content {
+    .component-modal__content {
         width: 100%;
         padding: 1.25rem;
         border-radius: var(--radius) var(--radius) 0 0;
     }
 
-    .component-delete-modal__actions {
+    .component-modal__actions {
         flex-direction: column-reverse;
     }
 
-    .component-delete-modal__actions .button {
+    .component-modal__actions .button {
         width: 100%;
         text-align: center;
     }

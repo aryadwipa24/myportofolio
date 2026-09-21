@@ -1,0 +1,73 @@
+<div id="delete-experience" class="component-modal" popover="auto">
+    <button type="button"
+            class="component-modal__backdrop"
+            popovertarget="delete-experience"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="component-modal__content">
+        <button type="button"
+                class="component-modal__close"
+                popovertarget="delete-experience"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        
+        <h2>Centang Riwayat Pendidikan yang Ingin Dihapus</h2>
+        
+        <form method="post" action="{% url 'main:delete_experience' %}">
+            {% csrf_token %}
+            {% include 'components/password.html' %}
+            <div class="delete-checkbox-list">
+                {% for experience in experience_list %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" 
+                               id="experience-{{ experience.id }}" 
+                               name="selected_experiences" 
+                               value="{{ experience.id }}">
+                        <label for="experience-{{ experience.id }}">{{ experience.title }}</label>
+                    </div>
+                {% empty %}
+                    <p>Tidak ada data untuk dihapus.</p>
+                {% endfor %}
+            </div>
+
+            <div class="component-modal__actions">
+                <button type="button"
+                class="button button-secondary"
+                popovertarget="delete-experience"
+                popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="edit-experience-modal" class="component-modal" popover="auto">
+    <div class="component-modal__content">
+        <button type="button" 
+                class="component-modal__close" 
+                popovertarget="edit-experience-modal" 
+                popovertargetaction="hide"
+                aria-label="Tutup modal">×</button>
+        
+        <h2>Pilih Pengalaman yang Ingin Diubah</h2>
+        <p>Klik salah satu untuk mengedit datanya:</p>
+
+        <div class="edit-select-list">
+            {% for experience in experience_list %}
+                <a href="{% url 'main:edit_experience' experience.id %}" 
+                   class="button button-secondary">
+                    {{ experience.title }}
+                </a>
+            {% empty %}
+                <p>Belum ada data untuk diubah.</p>
+            {% endfor %}
+        </div>
+
+        <div class="component-modal__actions">
+            <button type="button" 
+                    class="button button-secondary" 
+                    popovertarget="edit-experience-modal" 
+                    popovertargetaction="hide">Batal</button>
+        </div>
+    </div>
+</div>
