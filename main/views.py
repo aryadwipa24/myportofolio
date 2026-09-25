@@ -107,7 +107,6 @@ def show_experience(request):
     }
     return render(request, "experience_templates/experience.html", context)
 
-@require_secret_key
 def create_experience(request):
     form = ExperienceForm(request.POST or None, request.FILES)
 
@@ -122,7 +121,6 @@ def create_experience(request):
     }
     return render(request, "experience_templates/experience_form.html", context)
 
-@require_secret_key
 def delete_experience(request):
     experience_ids = request.POST.getlist("selected_experiences")
 
@@ -143,8 +141,14 @@ def get_experience_json(request):
     experience_json = serializers.serialize("json", experience)
     return HttpResponse(experience_json, content_type="application/json")
 
-@require_secret_key
+@login_required(login_url="/login/")
 def edit_experience(request, experience_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    is_superuser = request.user.is_superuser
+
+    if not (is_editor or is_superuser):
+        raise PermissionDenied
+    
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, request.FILES, instance=experience)
 
@@ -183,7 +187,6 @@ def show_skill(request):
     }
     return render(request, "skill_templates/skill.html", context)
 
-@require_secret_key
 def create_skill(request):
     form = SkillForm(request.POST or None, request.FILES)
 
@@ -198,7 +201,6 @@ def create_skill(request):
     }
     return render(request, "skill_templates/skill_form.html", context)
 
-@require_secret_key
 def delete_skill(request):
     skill_ids = request.POST.getlist("selected_skills")
 
@@ -219,8 +221,14 @@ def get_skill_json(request):
     skill_json = serializers.serialize("json", skill)
     return HttpResponse(skill_json, content_type="application/json")
 
-@require_secret_key
+@login_required(login_url="/login/")
 def edit_skill(request, skill_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    is_superuser = request.user.is_superuser
+
+    if not (is_superuser or is_editor):
+        raise PermissionDenied
+    
     skill = get_object_or_404(Skill, pk=skill_id)
     form = SkillForm(request.POST or None, request.FILES, instance=skill)
 
@@ -260,7 +268,6 @@ def show_education(request):
     }
     return render(request, "education_templates/education.html", context)
 
-@require_secret_key
 def create_education(request):
     form = EducationForm(request.POST or None, request.FILES)
 
@@ -275,7 +282,6 @@ def create_education(request):
     }
     return render(request, "education_templates/education_form.html", context)
 
-@require_secret_key
 def delete_education(request):
     education_ids = request.POST.getlist("selected_educations")
 
@@ -296,8 +302,14 @@ def get_education_json(request):
     education_json = serializers.serialize("json", education)
     return HttpResponse(education_json, content_type="application/json")
 
-@require_secret_key
+@login_required(login_url="/login/")
 def edit_education(request, education_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    is_superuser = request.user.is_superuser
+
+    if not (is_editor or is_superuser):
+        raise PermissionDenied
+    
     education = get_object_or_404(Education, pk=education_id)
     form = EducationForm(request.POST or None, request.FILES, instance=education)
 
@@ -320,7 +332,6 @@ def edit_education(request, education_id):
     return render(request, "education_templates/education_edit_form.html", context)
 
 @login_required
-@require_secret_key
 def create_project(request):
     if not request.user.is_superuser:
         raise PermissionDenied
@@ -339,7 +350,6 @@ def create_project(request):
     return render(request, "project_templates/projects_form.html", context)
 
 @login_required
-@require_secret_key
 def delete_project(request, project_id):
     if not request.user.is_superuser:
         raise PermissionDenied

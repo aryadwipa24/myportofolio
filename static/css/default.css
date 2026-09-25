@@ -33,6 +33,12 @@ h1, .brand {
     padding: 0 1.5rem;
 }
 
+.account-direct {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
 .site-header {
     border-bottom: 3px solid var(--line);
     position: sticky;

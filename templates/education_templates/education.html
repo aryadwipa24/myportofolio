@@ -9,20 +9,26 @@
         <div class="container education-grid">
             <h2 class="title">My Educations</h2>
             <div class="actions-button">
-                <a href="{% url 'main:create_education' %}"
-                    class="button education-add-button">
-                    <span aria-hidden="true">+</span>
-                    Tambah Riwayat Pendidikan
-                </a>
+                {% if user.is_superuser %}
+                    <a href="{% url 'main:create_education' %}"
+                        class="button education-add-button">
+                        <span aria-hidden="true">+</span>
+                        Tambah Riwayat Pendidikan
+                    </a>
+                {% endif %}
 
                 {% if education_list %}
-                <button type="button" class="button button-secondary" popovertarget="edit-education-modal">
-                    Edit Riwayat Pendidikan
-                </button>
+                    {% if user.is_superuser or perms.main.change_education %}
+                        <button type="button" class="button button-secondary" popovertarget="edit-education-modal">
+                            Edit Riwayat Pendidikan
+                        </button>
+                    {% endif %}
 
-                <button type="button" class="button button-danger" popovertarget="delete-education">
-                    Hapus Riwayat Pendidikan
-                </button>
+                    {% if user.is_superuser %}
+                        <button type="button" class="button button-danger" popovertarget="delete-education">
+                            Hapus Riwayat Pendidikan
+                        </button>
+                    {% endif %}
                 {% endif %}
             </div>
 
