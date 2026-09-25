@@ -55,11 +55,21 @@ h1, .brand {
 
 .site-header nav {
     display: flex;
-    gap: 2rem;
+    align-items: center;
+}
+
+.site-header nav ul.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .site-header nav a {
     color: var(--ink);
+    text-decoration: none;
 }
 
 .site-header nav li {
@@ -68,7 +78,7 @@ h1, .brand {
 }
 
 .site-header nav .section-navbar {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0.5rem 1rem;
