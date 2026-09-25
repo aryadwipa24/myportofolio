@@ -107,7 +107,11 @@ def show_experience(request):
     }
     return render(request, "experience_templates/experience.html", context)
 
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_super:
+        raise PermissionDenied
+    
     form = ExperienceForm(request.POST or None, request.FILES)
 
     if request.method == "POST" and form.is_valid():
@@ -121,7 +125,11 @@ def create_experience(request):
     }
     return render(request, "experience_templates/experience_form.html", context)
 
+@login_required(login_url="/login/")
 def delete_experience(request):
+    if not request.user.is_super:
+        raise PermissionDenied
+    
     experience_ids = request.POST.getlist("selected_experiences")
 
     if request.method == "POST":
@@ -187,7 +195,11 @@ def show_skill(request):
     }
     return render(request, "skill_templates/skill.html", context)
 
+@login_required(login_url="/login/")
 def create_skill(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = SkillForm(request.POST or None, request.FILES)
 
     if request.method == "POST" and form.is_valid():
@@ -201,7 +213,11 @@ def create_skill(request):
     }
     return render(request, "skill_templates/skill_form.html", context)
 
+@login_required(login_url="/login.")
 def delete_skill(request):
+    if not request.user.is_superuser:
+            raise PermissionDenied
+    
     skill_ids = request.POST.getlist("selected_skills")
 
     if request.method == "POST":
@@ -268,7 +284,11 @@ def show_education(request):
     }
     return render(request, "education_templates/education.html", context)
 
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+            raise PermissionDenied
+    
     form = EducationForm(request.POST or None, request.FILES)
 
     if request.method == "POST" and form.is_valid():
@@ -282,7 +302,11 @@ def create_education(request):
     }
     return render(request, "education_templates/education_form.html", context)
 
+@login_required(login_url=".login/")
 def delete_education(request):
+    if not request.user.is_superuser:
+            raise PermissionDenied
+    
     education_ids = request.POST.getlist("selected_educations")
 
     if request.method == "POST":

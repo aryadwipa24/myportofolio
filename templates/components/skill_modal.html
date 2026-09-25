@@ -46,7 +46,6 @@
         
         <form method="post" action="{% url 'main:delete_skill' %}">
             {% csrf_token %}
-            {% include 'components/password.html' %}
             <div class="delete-checkbox-list">
                 {% for skill in skill_list %}
                     <div class="checkbox-item">

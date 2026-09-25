@@ -12,7 +12,6 @@
                   class="experience-form"
                   enctype="multipart/form-data">
                 {% csrf_token %}
-                {% include 'components/password.html' %}
                 {% for field in form %}
                     <div class="form-group">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
