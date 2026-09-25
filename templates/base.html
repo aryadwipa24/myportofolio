@@ -21,18 +21,27 @@
     <div class="container">
         <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
         <nav>
-                <ul>
-                    <li>
-                        <a class="section-navbar" href="#">Section List ▾</a>
-                        <ul class="dropdown">
-                            <li><a href="{% url 'main:show_main' %}">Profile</a></li>
-                            <li><a href="{% url 'main:show_experience' %}">Experience</a></li>
-                            <li><a href="{% url 'main:show_skill' %}">Skill</a></li>
-                            <li><a href="{% url 'main:show_education' %}">Education</a></li>
-                            <li><a href="{% url 'main:show_projects' %}">Projects</a></li>
-                    </li>
-                </ul>
-            </nav>
+            <ul class="nav-menu">
+                <li class="nav-item has-dropdown">
+                    <a class="section-navbar" href="#">Section List ▾</a>
+                    <ul class="dropdown">
+                        <li><a href="{% url 'main:show_main' %}">Profile</a></li>
+                        <li><a href="{% url 'main:show_experience' %}">Experience</a></li>
+                        <li><a href="{% url 'main:show_skill' %}">Skill</a></li>
+                        <li><a href="{% url 'main:show_education' %}">Education</a></li>
+                        <li><a href="{% url 'main:show_projects' %}">Projects</a></li>
+                    </ul>
+                </li>
+
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><span class="section-navbar">{{ user.username }}</span></li>
+                    <li class="nav-item"><a class="section-navbar" href="{% url 'main:logout' %}">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="section-navbar" href="{% url 'main:login' %}">Login</a></li>
+                    <li class="nav-item"><a class="section-navbar" href="{% url 'main:register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
   </header>
   {% block content %} {% endblock content %}
