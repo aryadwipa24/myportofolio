@@ -8,9 +8,17 @@
 
 .education-info {
     padding-left: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
 }
 
 .education-section {
     padding: 4rem 0;
 }
 
+.star-education {
+    position: absolute;
+    padding-top: 3.7rem;
+}

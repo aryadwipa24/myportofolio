@@ -1,12 +1,13 @@
 import os
 
+from django.apps import apps
 from django.contrib import messages
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, Http404
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from main.models import Experience, Skill, Education, Project
@@ -15,7 +16,12 @@ from main.forms import ProjectForm, EducationForm, SkillForm, ExperienceForm
 from functools import wraps
 import datetime
 
-SECRET_KEY = os.getenv("SECRET_API_KEY", "HewanHewanApaYangSatuKata?")
+MODEL = {
+    'experience': 'Experience',
+    'skill': 'Skill',
+    'education': 'Education',
+    'project': 'Project',
+}
 
 def require_secret_key(view_func):
     @wraps(view_func)
@@ -323,7 +329,7 @@ def get_education_json(request):
     if title_query:
         education = education.filter(title__icontains=title_query)
 
-    education_json = serializers.serialize("json", education)
+    education_json = serializers.serialize("json", education, use_natural_foreign_keys=True)
     return HttpResponse(education_json, content_type="application/json")
 
 @login_required(login_url="/login/")
@@ -415,13 +421,17 @@ def get_projects_json(request):
     return HttpResponse(projects_json, content_type="application/json")
 
 @login_required(login_url="/login/")
-def toggle_star(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
+def toggle_star(request, model_name, item_id):
+    model_name = model_name.lower()
+    if model_name not in MODEL:
+        raise Http404("Model tidak ditemukan")
+    ModelClass = apps.get_model('main', MODEL[model_name])
+    item = get_object_or_404(ModelClass, pk=item_id)
 
     if request.method == "POST":
-        if request.user in project.starred_by.all():
-            project.starred_by.remove(request.user)
+        if request.user in item.starred_by.all():
+            item.starred_by.remove(request.user)
         else:
-            project.starred_by.add(request.user)
+            item.starred_by.add(request.user)
   
-    return redirect("main:show_projects")
+    return redirect(request.META.get('HTTP_REFERER', '/'))

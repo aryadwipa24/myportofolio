@@ -43,7 +43,10 @@
                         <div class="education-info">
                             <h3>{{ education.title }}</h3>
                             <span>{{ education.start|date:"F Y" }} - {{ education.ended }}</span>
+                            {% include "components/education_star.html" with education=education %}
                         </div>
+
+
                     </li>
                     {% empty %}
                     <div class="empty-state">

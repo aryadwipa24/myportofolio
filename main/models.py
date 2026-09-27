@@ -52,7 +52,9 @@ class Education(models.Model):
     image = models.ImageField(upload_to='educations/', blank=True, null=True)
     start = models.DateField()
     end = models.DateField(blank=True, null=True)
-
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_educations", blank=True
+    )
     def __str__(self):
         return self.title
 
