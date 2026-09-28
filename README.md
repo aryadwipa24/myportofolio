@@ -31,3 +31,8 @@ csrf_token wajib ditambahkan karena token tersebut menghasilkan token rahasia pa
 2. JSON lebih disukai karena file JSON lebih enak dilihat dan mudah dibaca karena berbentuk dictionary yang terdiri dari key-value, tidak seperti XML yang masih menggunakan tag, shingga kalau datanya banyak lebih tidak enak dilihat. Selain itu, JSON juga memiliki size file lebih kecil daripaa XML.
 
 3. Pertama-tama, client mengirimkan request HTTP ke server Django. Setelah itu Django akan menyocokkan URL request dengan route yang sesuai di urls.py dan mengirimkan request tersebut ke view yang sesuai. View akan mengambil data dari database menggunakan Django ORM, seperti objects.all() yang akan mereturn QuerySet yang berisikan instance dari suatu objek. Karena tipe data QuerySet python tidak bisa langsung diubah ke JSON, data ini harus dizerialization dulu ke tipe data primitif python, disinilah zerialization diperlukan untuk mengubahnya menjadi JSON. Setelah dizerialization, data akan direturn ke client dengan header.
+
+### Tugas 4
+Saya memakai Gemini untuk membantu dalam pembuatan fitur khusus superuser yang bisa langsung memberikan atau mencabut role Editor ke user biasa langsung lewat web tanpa harus ke htpps..../admin
+
+001 / Tugas-4: Fitur superuser bisa memberikan dan mencabut role Editor ke user biasa: https://share.gemini.google/4fmdywstXkDU

@@ -3,12 +3,13 @@ import os
 from django.apps import apps
 from django.contrib import messages
 from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout
+from django.contrib.auth.models import User, Group
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, Http404
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, Http404
 
 from main.models import Experience, Skill, Education, Project
 from main.forms import ProjectForm, EducationForm, SkillForm, ExperienceForm
@@ -22,26 +23,6 @@ MODEL = {
     'education': 'Education',
     'project': 'Project',
 }
-
-def require_secret_key(view_func):
-    @wraps(view_func)
-    def _wrapped_view(request, *args, **kwargs):
-        if request.method == 'GET':
-            return view_func(request, *args, **kwargs)
-        
-        header_key = request.META.get("HTTP_X_SECRET_KEY")
-        form_key = request.POST.get("secret_password")
-
-        if header_key == SECRET_KEY or form_key == SECRET_KEY:
-            return view_func(request, *args, **kwargs)
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'api' in request.path:
-            return JsonResponse({'error': 'Password salah!'}, status=403)
-
-        messages.error(request, "Password salah!")
-        return redirect(request.META.get('HTTP_REFERER', '/'))
-
-    return _wrapped_view
 
 def register(request):
     form = UserCreationForm(request.POST or None)
@@ -78,6 +59,52 @@ def logout_user(request):
     response = redirect("main:show_main")
     response.delete_cookie("last_login")
     return response
+
+@login_required(login_url="/login/")
+def manage_role(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    editor, _ = Group.objects.get_or_create(name="Editor")
+    if request.method == 'POST':
+        users_non_editor = request.POST.getlist('add_editor')
+        users_editor = request.POST.getlist('remove_editor')
+        if users_non_editor:
+            users_add = User.objects.filter(id__in=users_non_editor)
+            for user in users_add:
+                user.groups.add(editor)
+
+        if users_editor:
+            users_remove = User.objects.filter(id__in=users_editor)
+            for user in users_remove:
+                user.groups.remove(editor)
+
+        messages.success(request, "Perubahan role berhasil disimpan")
+
+        return redirect('main:manage_role')
+
+
+    non_editor_query = request.GET.get("search-non-editor", "").strip()
+    editor_query = request.GET.get("search-editor", "").strip()
+    non_editor = User.objects.exclude(groups=editor).exclude(is_superuser=True)
+    editor = User.objects.filter(groups=editor).exclude(is_superuser=True)
+
+    if non_editor_query:
+        non_editor = non_editor.filter(username__icontains=non_editor_query)
+
+    if editor_query:
+        editor = editor.filter(username__icontains=editor_query)
+        
+    context = {
+        'name': 'Arya Dwipa Wicaksana',
+        'non_editor': non_editor,
+        'editor': editor,
+        'non_editor_query': non_editor_query,
+        'editor_query': editor_query,
+    }
+
+    return render(request, 'manage_role.html', context)
+
 
 def show_main(request):
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
