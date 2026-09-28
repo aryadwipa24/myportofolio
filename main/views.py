@@ -142,7 +142,7 @@ def show_experience(request):
 
 @login_required(login_url="/login/")
 def create_experience(request):
-    if not request.user.is_super:
+    if not request.user.is_superuser:
         raise PermissionDenied
     
     form = ExperienceForm(request.POST or None, request.FILES)
@@ -160,7 +160,7 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def delete_experience(request):
-    if not request.user.is_super:
+    if not request.user.is_superuser:
         raise PermissionDenied
     
     experience_ids = request.POST.getlist("selected_experiences")
@@ -246,10 +246,10 @@ def create_skill(request):
     }
     return render(request, "skill_templates/skill_form.html", context)
 
-@login_required(login_url="/login.")
+@login_required(login_url="/login/")
 def delete_skill(request):
     if not request.user.is_superuser:
-            raise PermissionDenied
+        raise PermissionDenied
     
     skill_ids = request.POST.getlist("selected_skills")
 
@@ -320,7 +320,7 @@ def show_education(request):
 @login_required(login_url="/login/")
 def create_education(request):
     if not request.user.is_superuser:
-            raise PermissionDenied
+        raise PermissionDenied
     
     form = EducationForm(request.POST or None, request.FILES)
 
@@ -338,7 +338,7 @@ def create_education(request):
 @login_required(login_url=".login/")
 def delete_education(request):
     if not request.user.is_superuser:
-            raise PermissionDenied
+        raise PermissionDenied
     
     education_ids = request.POST.getlist("selected_educations")
 
@@ -388,7 +388,7 @@ def edit_education(request, education_id):
         }
     return render(request, "education_templates/education_edit_form.html", context)
 
-@login_required
+@login_required(login_url="/login/")
 def create_project(request):
     if not request.user.is_superuser:
         raise PermissionDenied
@@ -406,7 +406,7 @@ def create_project(request):
     }
     return render(request, "project_templates/projects_form.html", context)
 
-@login_required
+@login_required(login_url="/login/")
 def delete_project(request, project_id):
     if not request.user.is_superuser:
         raise PermissionDenied
