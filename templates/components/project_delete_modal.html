@@ -33,7 +33,6 @@
             
             <form method="post" action="{% url 'main:delete_project' project.id %}">
                 {% csrf_token %}
-                {% include 'components/password.html' %}
                 <button type="submit" class="button button-danger">Ya, Hapus</button>
                 <button type="button"
                     class="button button-secondary"

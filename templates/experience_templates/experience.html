@@ -11,20 +11,26 @@
             <h1>Experience</h1>
 
             <div class="actions-button">
-                <a href="{% url 'main:create_experience' %}"
-                    class="button experience-add-button">
-                    <span aria-hidden="true">+</span>
-                    Tambah Experience
-                </a>
-
+                {% if user.is_superuser %}
+                    <a href="{% url 'main:create_experience' %}"
+                        class="button experience-add-button">
+                        <span aria-hidden="true">+</span>
+                        Tambah Experience
+                    </a>
+                {% endif %}
+                
                 {% if experience_list %}
-                <button type="button" class="button button-secondary" popovertarget="edit-experience-modal">
-                    Edit Experience
-                </button>
+                    {% if user.is_superuser or perms.main.change_experience %}
+                        <button type="button" class="button button-secondary" popovertarget="edit-experience-modal">
+                            Edit Experience
+                        </button>
+                    {% endif %}
 
-                <button type="button" class="button button-danger" popovertarget="delete-experience">
-                    Hapus Experience
-                </button>
+                    {% if user.is_superuser %}
+                        <button type="button" class="button button-danger" popovertarget="delete-experience">
+                            Hapus Experience
+                        </button>
+                    {% endif %}
                 {% endif %}
             </div>
 

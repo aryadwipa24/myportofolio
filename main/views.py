@@ -1,13 +1,15 @@
 import os
 
+from django.apps import apps
 from django.contrib import messages
 from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout
+from django.contrib.auth.models import User, Group
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, Http404
 
 from main.models import Experience, Skill, Education, Project
 from main.forms import ProjectForm, EducationForm, SkillForm, ExperienceForm
@@ -15,27 +17,12 @@ from main.forms import ProjectForm, EducationForm, SkillForm, ExperienceForm
 from functools import wraps
 import datetime
 
-SECRET_KEY = os.getenv("SECRET_API_KEY", "HewanHewanApaYangSatuKata?")
-
-def require_secret_key(view_func):
-    @wraps(view_func)
-    def _wrapped_view(request, *args, **kwargs):
-        if request.method == 'GET':
-            return view_func(request, *args, **kwargs)
-        
-        header_key = request.META.get("HTTP_X_SECRET_KEY")
-        form_key = request.POST.get("secret_password")
-
-        if header_key == SECRET_KEY or form_key == SECRET_KEY:
-            return view_func(request, *args, **kwargs)
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'api' in request.path:
-            return JsonResponse({'error': 'Password salah!'}, status=403)
-
-        messages.error(request, "Password salah!")
-        return redirect(request.META.get('HTTP_REFERER', '/'))
-
-    return _wrapped_view
+MODEL = {
+    'experience': 'Experience',
+    'skill': 'Skill',
+    'education': 'Education',
+    'project': 'Project',
+}
 
 def register(request):
     form = UserCreationForm(request.POST or None)
@@ -73,6 +60,52 @@ def logout_user(request):
     response.delete_cookie("last_login")
     return response
 
+@login_required(login_url="/login/")
+def manage_role(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    editor, _ = Group.objects.get_or_create(name="Editor")
+    if request.method == 'POST':
+        users_non_editor = request.POST.getlist('add_editor')
+        users_editor = request.POST.getlist('remove_editor')
+        if users_non_editor:
+            users_add = User.objects.filter(id__in=users_non_editor)
+            for user in users_add:
+                user.groups.add(editor)
+
+        if users_editor:
+            users_remove = User.objects.filter(id__in=users_editor)
+            for user in users_remove:
+                user.groups.remove(editor)
+
+        messages.success(request, "Perubahan role berhasil disimpan")
+
+        return redirect('main:manage_role')
+
+
+    non_editor_query = request.GET.get("search-non-editor", "").strip()
+    editor_query = request.GET.get("search-editor", "").strip()
+    non_editor = User.objects.exclude(groups=editor).exclude(is_superuser=True)
+    editor = User.objects.filter(groups=editor).exclude(is_superuser=True)
+
+    if non_editor_query:
+        non_editor = non_editor.filter(username__icontains=non_editor_query)
+
+    if editor_query:
+        editor = editor.filter(username__icontains=editor_query)
+        
+    context = {
+        'name': 'Arya Dwipa Wicaksana',
+        'non_editor': non_editor,
+        'editor': editor,
+        'non_editor_query': non_editor_query,
+        'editor_query': editor_query,
+    }
+
+    return render(request, 'manage_role.html', context)
+
+
 def show_main(request):
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
     context = {
@@ -107,8 +140,11 @@ def show_experience(request):
     }
     return render(request, "experience_templates/experience.html", context)
 
-@require_secret_key
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = ExperienceForm(request.POST or None, request.FILES)
 
     if request.method == "POST" and form.is_valid():
@@ -122,8 +158,11 @@ def create_experience(request):
     }
     return render(request, "experience_templates/experience_form.html", context)
 
-@require_secret_key
+@login_required(login_url="/login/")
 def delete_experience(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     experience_ids = request.POST.getlist("selected_experiences")
 
     if request.method == "POST":
@@ -143,8 +182,14 @@ def get_experience_json(request):
     experience_json = serializers.serialize("json", experience)
     return HttpResponse(experience_json, content_type="application/json")
 
-@require_secret_key
+@login_required(login_url="/login/")
 def edit_experience(request, experience_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    is_superuser = request.user.is_superuser
+
+    if not (is_editor or is_superuser):
+        raise PermissionDenied
+    
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, request.FILES, instance=experience)
 
@@ -183,8 +228,11 @@ def show_skill(request):
     }
     return render(request, "skill_templates/skill.html", context)
 
-@require_secret_key
+@login_required(login_url="/login/")
 def create_skill(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = SkillForm(request.POST or None, request.FILES)
 
     if request.method == "POST" and form.is_valid():
@@ -198,8 +246,11 @@ def create_skill(request):
     }
     return render(request, "skill_templates/skill_form.html", context)
 
-@require_secret_key
+@login_required(login_url="/login/")
 def delete_skill(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     skill_ids = request.POST.getlist("selected_skills")
 
     if request.method == "POST":
@@ -219,8 +270,14 @@ def get_skill_json(request):
     skill_json = serializers.serialize("json", skill)
     return HttpResponse(skill_json, content_type="application/json")
 
-@require_secret_key
+@login_required(login_url="/login/")
 def edit_skill(request, skill_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    is_superuser = request.user.is_superuser
+
+    if not (is_superuser or is_editor):
+        raise PermissionDenied
+    
     skill = get_object_or_404(Skill, pk=skill_id)
     form = SkillForm(request.POST or None, request.FILES, instance=skill)
 
@@ -260,8 +317,11 @@ def show_education(request):
     }
     return render(request, "education_templates/education.html", context)
 
-@require_secret_key
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = EducationForm(request.POST or None, request.FILES)
 
     if request.method == "POST" and form.is_valid():
@@ -275,8 +335,11 @@ def create_education(request):
     }
     return render(request, "education_templates/education_form.html", context)
 
-@require_secret_key
+@login_required(login_url=".login/")
 def delete_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     education_ids = request.POST.getlist("selected_educations")
 
     if request.method == "POST":
@@ -293,11 +356,17 @@ def get_education_json(request):
     if title_query:
         education = education.filter(title__icontains=title_query)
 
-    education_json = serializers.serialize("json", education)
+    education_json = serializers.serialize("json", education, use_natural_foreign_keys=True)
     return HttpResponse(education_json, content_type="application/json")
 
-@require_secret_key
+@login_required(login_url="/login/")
 def edit_education(request, education_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    is_superuser = request.user.is_superuser
+
+    if not (is_editor or is_superuser):
+        raise PermissionDenied
+    
     education = get_object_or_404(Education, pk=education_id)
     form = EducationForm(request.POST or None, request.FILES, instance=education)
 
@@ -319,8 +388,7 @@ def edit_education(request, education_id):
         }
     return render(request, "education_templates/education_edit_form.html", context)
 
-@login_required
-@require_secret_key
+@login_required(login_url="/login/")
 def create_project(request):
     if not request.user.is_superuser:
         raise PermissionDenied
@@ -338,8 +406,7 @@ def create_project(request):
     }
     return render(request, "project_templates/projects_form.html", context)
 
-@login_required
-@require_secret_key
+@login_required(login_url="/login/")
 def delete_project(request, project_id):
     if not request.user.is_superuser:
         raise PermissionDenied
@@ -381,13 +448,17 @@ def get_projects_json(request):
     return HttpResponse(projects_json, content_type="application/json")
 
 @login_required(login_url="/login/")
-def toggle_star(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
+def toggle_star(request, model_name, item_id):
+    model_name = model_name.lower()
+    if model_name not in MODEL:
+        raise Http404("Model tidak ditemukan")
+    ModelClass = apps.get_model('main', MODEL[model_name])
+    item = get_object_or_404(ModelClass, pk=item_id)
 
     if request.method == "POST":
-        if request.user in project.starred_by.all():
-            project.starred_by.remove(request.user)
+        if request.user in item.starred_by.all():
+            item.starred_by.remove(request.user)
         else:
-            project.starred_by.add(request.user)
+            item.starred_by.add(request.user)
   
-    return redirect("main:show_projects")
+    return redirect(request.META.get('HTTP_REFERER', '/'))

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block meta %}
+    <title>Manage User Role</title>
+{% endblock meta %}
+{% block content %}
+    <main>
+        <section class="experience-section">
+            <div class="container">
+                <h2>Manage User Role</h2>
+                {% if messages %}
+                    <div>
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <form method="get" action="{% url 'main:manage_role' %}" id="user-search"></form>
+
+                <form action="{% url 'main:manage_role' %}" method="post" class="role-form">
+                    {% csrf_token %}
+                    <div class="role-card">
+                        <h3 class="user-edit-header">Tambahkan User ke Role Editor</h3>
+                        <div class="user-search">
+                            <input type="search"
+                                    name="search-non-editor"
+                                    value="{{ non_editor_query }}"
+                                    placeholder="Cari berdasarkan username"
+                                    class="user-search__input"
+                                    aria-label="Cari berdasarkan username"
+                                    form="user-search">
+                            <button type="submit" class="button" form="user-search">Cari</button>
+                        </div>
+
+                        <div class="delete-checkbox-list">
+                            {% for user in non_editor %}
+                                <div class="checkbox-item">
+                                    <input type="checkbox" 
+                                    name="add_editor" 
+                                    id="add-user-{{ user.id }}"
+                                    value="{{ user.id }}"
+                                    class="checkbox-item__input">
+                                    <label for="add-user-{{ user.id }}" class="checkbox-item__label">{{ user.username }}</label>
+                                </div>
+                            {% empty %}
+                                {% if non_editor_query %}
+                                    <p class="checkbox-item__label">Tidak ada user dengan username tersebut.</p>
+                                {% else %}
+                                    <p class="checkbox-item__label">Tidak ada user biasa</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="role-card">
+                        <h3 class="user-edit-header">Cabut User dari Role Editor</h3>
+
+                        <div class="user-search">
+                            <input type="search"
+                                    name="search-editor"
+                                    value="{{ editor_query }}"
+                                    placeholder="Cari berdasarkan username"
+                                    class="user-search__input"
+                                    aria-label="Cari berdasarkan username"
+                                    form="user-search">
+                            <button type="submit" class="button" form="user-search" >Cari</button>
+                        </div>
+
+                        <div class="delete-checkbox-list">
+                            {% for user in editor %}
+                                <div class="checkbox-item">
+                                    <input type="checkbox" 
+                                    name="remove_editor" 
+                                    id="remove-user-{{ user.id }}"
+                                    value="{{ user.id }}"
+                                    class="checkbox-item__input">
+                                    <label for="remove-user-{{ user.id }}" class="checkbox-item__label">{{ user.username }}</label>
+                                </div>
+                            {% empty %}
+                                {% if editor_query %}
+                                    <p class="checkbox-item__label">Tidak ada user dengan username tersebut.</p>
+                                {% else %}
+                                    <p class="checkbox-item__label">Tidak ada user editor</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-action">
+                        <button type="submit" class="button button-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

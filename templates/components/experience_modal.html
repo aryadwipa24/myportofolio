@@ -15,7 +15,6 @@
         
         <form method="post" action="{% url 'main:delete_experience' %}">
             {% csrf_token %}
-            {% include 'components/password.html' %}
             <div class="delete-checkbox-list">
                 {% for experience in experience_list %}
                     <div class="checkbox-item">
