@@ -52,7 +52,7 @@
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: #fff;
-    color: var(--ink);
+    color: black;
     font: inherit;
 }
 
