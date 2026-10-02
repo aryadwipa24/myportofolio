@@ -15,19 +15,8 @@
         
         <form method="post" action="{% url 'main:delete_education' %}">
             {% csrf_token %}
-            <div class="delete-checkbox-list">
-                {% for education in education_list %}
-                    <div class="checkbox-item">
-                        <input type="checkbox" 
-                               id="edu-{{ education.id }}" 
-                               name="selected_educations" 
-                               value="{{ education.id }}">
-                        <label for="edu-{{ education.id }}">{{ education.title }}</label>
-                    </div>
-                {% empty %}
-                    <p>Tidak ada data untuk dihapus.</p>
-                {% endfor %}
-            </div>
+            
+            <div id="delete-checkbox-list" class="delete-checkbox-list"></div>
 
             <div class="component-modal__actions">
                 <button type="button"
@@ -52,14 +41,7 @@
         <p>Klik salah satu untuk mengedit datanya:</p>
 
         <div class="edit-select-list">
-            {% for education in education_list %}
-                <a href="{% url 'main:edit_education' education.id %}" 
-                   class="button button-secondary">
-                    {{ education.title }}
-                </a>
-            {% empty %}
-                <p>Belum ada data untuk diubah.</p>
-            {% endfor %}
+            <div id="edit-select-list" class="edit-select-list"></div>
         </div>
 
         <div class="component-modal__actions">

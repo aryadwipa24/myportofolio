@@ -3,6 +3,7 @@ import os
 from django.apps import apps
 from django.contrib import messages
 from django.core import serializers
+from django.templatetags.static import static
 from django.views.decorators.http import require_POST
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User, Group
@@ -301,19 +302,10 @@ def edit_skill(request, skill_id):
     return render(request, "skill_templates/skill_edit_form.html", context)
 
 def show_education(request):
-    json_response = get_education_json(request)
-
-    educations = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    educations = [education.object for education in educations]
-    educations = sorted(educations, key=lambda x: x.start, reverse=True)
     title_query = request.GET.get("title", "").strip()
 
     context = {
         "name": "Arya Dwipa Wicaksana",
-        "education_list": educations,
         "title_query": title_query,
     }
     return render(request, "education_templates/education.html", context)
@@ -352,13 +344,31 @@ def delete_education(request):
 
 def get_education_json(request):
     title_query = request.GET.get("title", "").strip()
-    education = Education.objects.all()
+    educations = Education.objects.prefetch_related('starred_by').all().order_by('-start')
 
     if title_query:
-        education = education.filter(title__icontains=title_query)
+        educations = educations.filter(title__icontains=title_query)
 
-    education_json = serializers.serialize("json", education, use_natural_foreign_keys=True)
-    return HttpResponse(education_json, content_type="application/json")
+    data = []
+    for education in educations:
+        starred_users = education.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ",".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(education.id),
+            "fields": {
+                "title": education.title,
+                "image": education.image.url if education.image else static("img/no-image.png"),
+                "start": education.start.strftime("%B %Y"),
+                "end": education.ended,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url="/login/")
 def edit_education(request, education_id):

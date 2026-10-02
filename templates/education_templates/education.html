@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block meta %}
     <title>Education - {{ name }}</title>
 {% endblock meta %}
@@ -17,47 +18,49 @@
                     </a>
                 {% endif %}
 
-                {% if education_list %}
-                    {% if user.is_superuser or perms.main.change_education %}
-                        <button type="button" class="button button-secondary" popovertarget="edit-education-modal">
-                            Edit Riwayat Pendidikan
-                        </button>
-                    {% endif %}
-
-                    {% if user.is_superuser %}
-                        <button type="button" class="button button-danger" popovertarget="delete-education">
-                            Hapus Riwayat Pendidikan
-                        </button>
-                    {% endif %}
+                {% if user.is_superuser or perms.main.change_education %}
+                    <button type="button" class="button button-secondary" popovertarget="edit-education-modal">
+                        Edit Riwayat Pendidikan
+                    </button>
                 {% endif %}
+
+                {% if user.is_superuser %}
+                    <button type="button" class="button button-danger" popovertarget="delete-education">
+                        Hapus Riwayat Pendidikan
+                    </button>
+                {% endif %}
+
             </div>
 
-            <ul class="list-default education-list">
-                {% for education in education_list %}
-                    <li>
-                        {% if education.image %}
-                            <img src="{{ education.image.url }}" alt="Photo of {{ education.title }}">
-                        {% else %}
-                            <img src="/static/img/no-image.png" alt="no-image-png">
-                        {% endif %}                        
-                        <div class="education-info">
-                            <h3>{{ education.title }}</h3>
-                            <span>{{ education.start|date:"F Y" }} - {{ education.ended }}</span>
-                            {% include "components/education_star.html" with education=education %}
-                        </div>
+            <div id="loading" class="empty-state hide">
+                <p>Memuat pendidikan...</p>
+            </div>
 
+            <div id="error" class="empty-state hide">
+                <p>Gagal memuat data pendidikan. Silakan coba lagi.</p>
+            </div>
 
-                    </li>
-                    {% empty %}
-                    <div class="empty-state">
-                        <h3>Belum ada pendidikan yang ditambahkan.</h3>
-                    </div>
-                    {% endfor %}
-            </ul>
+            <div id="empty" class="empty-state hide">
+                <p>Belum ada pendidikan yang ditambahkan</p>
+            </div>
+
+            <ul id="grid" class="list-default education-list hide"></ul>
         </div>
     </section>
 
     {% include "components/education_modal.html" %}
 </main>
+
+<script src="{% static 'js/educations.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initEducations({
+            endpoint: "{% url 'main:get_education_json' %}",
+            csrfToken: "{{ csrf_token }}",
+            starUrlPattern: "{% url 'main:toggle_star' 'education' '00000000-0000-0000-0000-000000000000' %}",
+            editUrlPattern: "{% url 'main:edit_education' '00000000-0000-0000-0000-000000000000' %}",
+        });
+    });
+</script>
 
 {% endblock content %}
