@@ -5,7 +5,7 @@ from main.views import (show_main,
                         show_skill, create_skill, delete_skill, get_skill_json, edit_skill,
                         show_education, create_education, delete_education, get_education_json, edit_education, create_education_ajax,
                         show_projects, create_project, delete_project, get_projects_json, create_project_ajax, 
-                        register, login_user, logout_user, toggle_star, manage_role,)
+                        register, login_user, logout_user, toggle_star, manage_role, manage_role_ajax, get_manage_role_json,)
 
 app_name = "main"
 
@@ -38,7 +38,8 @@ urlpatterns = [
 
     path("projects/<str:model_name>/<uuid:item_id>/star/", toggle_star, name="toggle_star"),
     path("manage_role/", manage_role, name="manage_role"),
-
+    path("api/manage_role/", get_manage_role_json, name="get_manage_role_json"),
+    path("manage_role/ajax/", manage_role_ajax, name="manage_role_ajax"),
     path("register/", register, name="register"),
     path("login/", login_user, name="login"),
     path("logout/", logout_user, name="logout")
