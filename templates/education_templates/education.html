@@ -11,11 +11,12 @@
             <h2 class="title">My Educations</h2>
             <div class="actions-button">
                 {% if user.is_superuser %}
-                    <a href="{% url 'main:create_education' %}"
-                        class="button education-add-button">
+                    <button type="button"
+                            class="button education-add-button"
+                            popovertarget="add-education-modal">
                         <span aria-hidden="true">+</span>
                         Tambah Riwayat Pendidikan
-                    </a>
+                    </button>
                 {% endif %}
 
                 {% if user.is_superuser or perms.main.change_education %}
@@ -59,6 +60,7 @@
             csrfToken: "{{ csrf_token }}",
             starUrlPattern: "{% url 'main:toggle_star' 'education' '00000000-0000-0000-0000-000000000000' %}",
             editUrlPattern: "{% url 'main:edit_education' '00000000-0000-0000-0000-000000000000' %}",
+            createEducationUrl: "{% url 'main:create_education_ajax' %}"
         });
     });
 </script>

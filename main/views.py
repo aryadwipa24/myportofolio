@@ -307,6 +307,7 @@ def show_education(request):
     context = {
         "name": "Arya Dwipa Wicaksana",
         "title_query": title_query,
+        "form": EducationForm,
     }
     return render(request, "education_templates/education.html", context)
 
@@ -369,6 +370,24 @@ def get_education_json(request):
         })
 
     return JsonResponse(data, safe=False)
+
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan pendidikan."},
+            status=403,
+        )
+
+    form = EducationForm(request.POST, request.FILES)
+    if form.is_valid():
+        education = form.save()
+        return JsonResponse(
+            {"message": "Pendidikan berhasil ditambahkan.", "pk": str(education.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")
 def edit_education(request, education_id):

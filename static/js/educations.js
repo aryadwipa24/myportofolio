@@ -3,7 +3,7 @@ let educationAbortController;
 
 function initEducations(config) {
     educationConfig = config;
-
+    setupAddEducationHandler();
     fetchEducations();
 }
 
@@ -51,6 +51,10 @@ function buildEducationItemElement(item) {
     `;
 
     return liElement;
+}
+
+function closeEducationModal() {
+    document.getElementById("add-education-modal").hidePopover();
 }
 
 async function fetchEducations() {
@@ -124,4 +128,78 @@ function renderModalsData(educationData) {
             editContainer.appendChild(editButton);
         }
     });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function setupAddEducationHandler() {
+    const educationForm = document.getElementById('education-form');
+    if (educationForm) {
+        educationForm.addEventListener('submit', addEducation);
+    }
+}
+
+async function addEducation(event) {
+    event.preventDefault();
+    const educationForm = event.target;
+    const submitButton = educationForm.querySelector('button[type="submit"]');
+    
+    if (submitButton) submitButton.disabled = true;
+
+    try {
+        const response = await fetch(educationConfig.createEducationUrl, {
+            method: 'POST',
+            headers: { 
+                'X-CSRFToken': getCookie('csrftoken') || educationConfig.csrfToken 
+            },
+            body: new FormData(educationForm),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+            educationForm.reset();
+            
+            const modal = document.getElementById('add-education-modal');
+            if (modal && typeof modal.hidePopover === 'function') {
+                modal.hidePopover();
+            }
+
+            if (typeof showToast === 'function') {
+                showToast('Berhasil', 'Pendidikan baru berhasil ditambahkan!', 'success');
+            }
+
+            fetchEducations();
+        } else {
+            const errorMessages = result.errors
+                ? Object.values(result.errors).flat().map(error => error.message)
+                : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+            
+            if (typeof showToast === 'function') {
+                showToast('Gagal menambahkan pendidikan', errorMessages.join(' '), 'error');
+            } else {
+                alert('Gagal: ' + errorMessages.join(' '));
+            }
+        }
+    } catch (error) {
+        console.error('Error adding education:', error);
+        if (typeof showToast === 'function') {
+            showToast('Gagal', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+        }
+    } finally {
+        if (submitButton) submitButton.disabled = false;
+    }
 }
