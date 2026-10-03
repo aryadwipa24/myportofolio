@@ -14,12 +14,21 @@ function displayPageSection({ showLoading = false, showError = false, showEmpty 
     document.getElementById('grid')?.classList.toggle('hide', !showGrid);
 }
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+
 function buildEducationItemElement(item) {
     const edu = item.fields;
     const eduId = item.pk;
     const liElement = document.createElement('li');
 
-    const imageHtml = `<img src="${edu.image}" alt="Photo of ${edu.title}">`;
+    const imageHtml = `<img src="${edu.image}" alt="Photo of ${escapeHtml(edu.title)}">`;
 
     let starHtml = '';
     if (educationConfig.starUrlPattern) {
@@ -27,7 +36,7 @@ function buildEducationItemElement(item) {
         const isStarredClass = edu.is_starred ? " is-starred" : "";
         const starText = edu.is_starred ? "Unstar" : "Star";
         const starTitle = edu.star_count > 0 
-            ? `Dibintangi oleh ${edu.starred_by_names}` 
+            ? `Dibintangi oleh ${escapeHtml(edu.starred_by_names)}` 
             : "Jadilah yang pertama memberi star";
 
         starHtml = `
@@ -44,7 +53,7 @@ function buildEducationItemElement(item) {
     liElement.innerHTML = `
         ${imageHtml}
         <div class="education-info">
-            <h3>${edu.title}</h3>
+            <h3>${escapeHtml(edu.title)}</h3>
             <span>${edu.start} - ${edu.end}</span>
             ${starHtml}
         </div>
@@ -115,7 +124,7 @@ function renderModalsData(educationData) {
         checkboxItem.className = 'checkbox-item';
         checkboxItem.innerHTML = `
             <input type="checkbox" id="edu-${eduId}" name="selected_educations" value="${eduId}">
-            <label for="edu-${eduId}">${edu.title}</label>
+            <label for="edu-${eduId}">${escapeHtml(edu.title)}</label>
         `;
         deleteContainer.appendChild(checkboxItem);
 
@@ -124,7 +133,7 @@ function renderModalsData(educationData) {
             const editButton = document.createElement('a');
             editButton.href = editUrl;
             editButton.className = 'button button-secondary';
-            editButton.textContent = edu.title;
+            editButton.textContent = escapeHtml(edu.title);
             editContainer.appendChild(editButton);
         }
     });
