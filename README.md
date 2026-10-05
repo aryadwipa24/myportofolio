@@ -36,3 +36,13 @@ csrf_token wajib ditambahkan karena token tersebut menghasilkan token rahasia pa
 Saya memakai Gemini untuk membantu dalam pembuatan fitur khusus superuser yang bisa langsung memberikan atau mencabut role Editor ke user biasa langsung lewat web tanpa harus ke htpps..../admin
 
 001 / Tugas-4: Fitur superuser bisa memberikan dan mencabut role Editor ke user biasa: https://share.gemini.google/4fmdywstXkDU
+
+
+### Tugas 5
+Saya menggunakan Gemini dalam pengerjaan tugas ini untuk lebih memahami javascript
+
+1. Debouncing adalah teknik yang memberikan jeda yang diterapkan di suatu fungsi sehingga fungsi itu tidak langsung dipanggil berulang kali selama jeda itu. Teknik ini penting untuk diterapkan pada fitur pencarian yang menggunakan AJAX karena debouncing mengurangi beban server dengan membuat browser hanya mengirim permintaan setelah user berhenti mengetik sejenak.
+
+2. Await digunakan di fungsi async untuk menghentikan sementara eksekusi code berikutnya sampai promise dari fetch() selesai, lalu mengembalikan nilai hasil dari promise tersebut. Jika await tidak digunakan, promise akan tetap berjalan di belakang layar dan code berikutnya akan langsung dieksekusi tanpa menunggu hasilnya. Akibatnya baris berikutnya yang mengakses hasil dari promise akan menghasilkan error.
+
+3. XSS adakah jenis serangan yang menyisipkan code javascript berbahaya ke dalam konten website. Saat berada di page yang ada codenya itu, browser akan mengeksekusi code tersebut. Data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada template django karena template django melakukan auto-escaping pada setiap { variabel }, karakter seperti < dan > diubah menjadi &lt; dan &gt; sehingga browser menampilkannya sebagai teks biasa, bukan sebagai tag HTML. Sedangkan, di javascipt tidak dan harus diterapkan manual escapeHtml().
