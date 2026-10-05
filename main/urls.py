@@ -3,9 +3,9 @@ from django.urls import path
 from main.views import (show_main, 
                         show_experience, create_experience, delete_experience, get_experience_json, edit_experience,
                         show_skill, create_skill, delete_skill, get_skill_json, edit_skill,
-                        show_education, create_education, delete_education, get_education_json, edit_education,
+                        show_education, create_education, delete_education, get_education_json, edit_education, create_education_ajax,
                         show_projects, create_project, delete_project, get_projects_json, create_project_ajax, 
-                        register, login_user, logout_user, toggle_star, manage_role,)
+                        register, login_user, logout_user, toggle_star, manage_role, manage_role_ajax, get_manage_role_json,)
 
 app_name = "main"
 
@@ -28,6 +28,7 @@ urlpatterns = [
     path("education/delete/",delete_education,name="delete_education"),
     path("api/education/", get_education_json, name="get_education_json"),
     path("education/<uuid:education_id>/edit/", edit_education, name="edit_education"),
+    path("education/add-ajax/", create_education_ajax, name="create_education_ajax"),
 
     path("projects/", show_projects, name="show_projects"),
     path("projects/add/", create_project, name="create_project"),
@@ -37,7 +38,8 @@ urlpatterns = [
 
     path("projects/<str:model_name>/<uuid:item_id>/star/", toggle_star, name="toggle_star"),
     path("manage_role/", manage_role, name="manage_role"),
-
+    path("api/manage_role/", get_manage_role_json, name="get_manage_role_json"),
+    path("manage_role/ajax/", manage_role_ajax, name="manage_role_ajax"),
     path("register/", register, name="register"),
     path("login/", login_user, name="login"),
     path("logout/", logout_user, name="logout")

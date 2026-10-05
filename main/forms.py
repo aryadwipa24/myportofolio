@@ -109,6 +109,12 @@ class EducationForm(ModelForm):
         self.fields['start'].input_formats = ['%Y-%m', '%Y-%m-%d']
         self.fields['end'].input_formats = ['%Y-%m', '%Y-%m-%d']
 
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama pendidikan tidak boleh hanya berisi tag HTML.")
+        return title
+
 class SkillForm(ModelForm):
     class Meta:
         model = Skill

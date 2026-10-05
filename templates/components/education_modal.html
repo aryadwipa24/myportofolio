@@ -15,19 +15,8 @@
         
         <form method="post" action="{% url 'main:delete_education' %}">
             {% csrf_token %}
-            <div class="delete-checkbox-list">
-                {% for education in education_list %}
-                    <div class="checkbox-item">
-                        <input type="checkbox" 
-                               id="edu-{{ education.id }}" 
-                               name="selected_educations" 
-                               value="{{ education.id }}">
-                        <label for="edu-{{ education.id }}">{{ education.title }}</label>
-                    </div>
-                {% empty %}
-                    <p>Tidak ada data untuk dihapus.</p>
-                {% endfor %}
-            </div>
+            
+            <div id="delete-checkbox-list" class="delete-checkbox-list"></div>
 
             <div class="component-modal__actions">
                 <button type="button"
@@ -52,14 +41,7 @@
         <p>Klik salah satu untuk mengedit datanya:</p>
 
         <div class="edit-select-list">
-            {% for education in education_list %}
-                <a href="{% url 'main:edit_education' education.id %}" 
-                   class="button button-secondary">
-                    {{ education.title }}
-                </a>
-            {% empty %}
-                <p>Belum ada data untuk diubah.</p>
-            {% endfor %}
+            <div id="edit-select-list" class="edit-select-list"></div>
         </div>
 
         <div class="component-modal__actions">
@@ -68,5 +50,45 @@
                     popovertarget="edit-education-modal" 
                     popovertargetaction="hide">Batal</button>
         </div>
+    </div>
+</div>
+
+<div id="add-education-modal"
+     class="component-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="add-education-modal-title">
+
+    <div class="component-modal__content">
+        <button type="button"
+                class="project-form-modal__close"
+                popovertarget="add-education-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup form tambah pendidikan">×</button>
+
+        <h2 id="add-education-modal-title">Tambah Pendidikan Baru</h2>
+        <form id="education-form"
+              method="post"
+              action="{% url 'main:create_education' %}"
+              class="project-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <div class="education-form-modal__actions">
+                <button type="button"
+                        class="button button-secondary"
+                        popovertarget="add-education-modal"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button">Tambah pendidikan</button>
+            </div>
+        </form>
     </div>
 </div>
