@@ -315,11 +315,13 @@ def edit_skill(request, skill_id):
 
 def show_education(request):
     title_query = request.GET.get("title", "").strip()
+    is_editor = request.user.is_authenticated and request.user.groups.filter(name="Editor").exists()
 
     context = {
         "name": "Arya Dwipa Wicaksana",
         "title_query": title_query,
         "form": EducationForm,
+        "is_editor": is_editor,
     }
     return render(request, "education_templates/education.html", context)
 

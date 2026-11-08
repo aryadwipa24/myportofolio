@@ -19,7 +19,7 @@
                     </button>
                 {% endif %}
 
-                {% if user.is_superuser or perms.main.change_education %}
+                {% if user.is_superuser or is_editor %}
                     <button type="button" class="button button-secondary" popovertarget="edit-education-modal">
                         Edit Riwayat Pendidikan
                     </button>
@@ -56,11 +56,14 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         initEducations({
-            endpoint: "{% url 'main:get_education_json' %}",
-            csrfToken: "{{ csrf_token }}",
-            starUrlPattern: "{% url 'main:toggle_star' 'education' '00000000-0000-0000-0000-000000000000' %}",
+            endpoint: "{% url 'api:education-list' %}",
+            detailUrlPattern: "{% url 'api:education-detail' '00000000-0000-0000-0000-000000000000' %}",
+            starUrlPattern: "{% url 'api:education-star' '00000000-0000-0000-0000-000000000000' %}",
             editUrlPattern: "{% url 'main:edit_education' '00000000-0000-0000-0000-000000000000' %}",
-            createEducationUrl: "{% url 'main:create_education_ajax' %}"
+            csrfToken: "{{ csrf_token }}",
+            isAuthenticated: "{{ user.is_authenticated|yesno:'true,false' }}" === "true",
+            isSuperuser: "{{ user.is_superuser|yesno:'true,false' }}" === "true",
+            isEditor: "{{ is_editor|yesno:'true,false' }}" === "true"
         });
     });
 </script>
