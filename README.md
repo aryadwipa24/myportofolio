@@ -46,3 +46,22 @@ Saya menggunakan Gemini dalam pengerjaan tugas ini untuk lebih memahami javascri
 2. Await digunakan di fungsi async untuk menghentikan sementara eksekusi code berikutnya sampai promise dari fetch() selesai, lalu mengembalikan nilai hasil dari promise tersebut. Jika await tidak digunakan, promise akan tetap berjalan di belakang layar dan code berikutnya akan langsung dieksekusi tanpa menunggu hasilnya. Akibatnya baris berikutnya yang mengakses hasil dari promise akan menghasilkan error.
 
 3. XSS adakah jenis serangan yang menyisipkan code javascript berbahaya ke dalam konten website. Saat berada di page yang ada codenya itu, browser akan mengeksekusi code tersebut. Data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada template django karena template django melakukan auto-escaping pada setiap { variabel }, karakter seperti < dan > diubah menjadi &lt; dan &gt; sehingga browser menampilkannya sebagai teks biasa, bukan sebagai tag HTML. Sedangkan, di javascipt tidak dan harus diterapkan manual escapeHtml().
+
+### Tugas 6
+Saya menggunakan Gemini dalam pengerjaan tugas ini untuk membantu memahami dan mengintegrasikan API dengan AJAX 
+
+1. REST (Representational State Transfer) adalah gaya arsitektur untuk merancang web API, bukan library atau format data. REST memiliki tiga gagasan utama, yaitu data diperlakukan sebagai ressource, HTTP method menyatakan tindakan, serta client dan server bertukar representasi data. JSON saja belum cukup untuk menyebut API sebagai RESTful karena JSON hanya merupakan format representasi data dan tidak memenuhi gagasan tersebut.
+
+Perbedaan PUT dan PATCH adalah PUT digunakan untuk mengganti representasi secara keseluruhan field wajib, sedangkan PATCH digunakan untuk memperbarui sebagian field.
+
+2. Serializer pada Django REST berfungsi untuk mengubah objek Python atau model Django menjadi data yang dapat dikirim melalui API, sekaligus memvalidasi dan mengubah data yang diterima dari client sebelum disimpan ke database.
+
+Keuntungan menggunakan serializer dibandingkan JsonResponse adalah serializer membuat kode lebih terstruktur dan mengurangi pengulangan. ModelSerializer dapat membentuk field berdasarkan model, menyediakan proses create() dan update(), serta menjalankan validasi melalui is_valid(). Serializer juga mendukung read_only_fields dan SerializerMethodField untuk data hasil perhitungan.
+
+3. Autentikasi adalah proses untuk mengecek siapa penggunanya, sedengkan otorisasi adalah pemberian hak apa saja yang boleh dilakukan oleh pengguna. Pada DRF, SessionAuthentication mengenali pengguna melalui session Django dan mengisi request.user, sedangkan permission class menentukan apakah request itu boleh dilakukan.
+
+Hak akses harus diperiksa melalui permission class di server karena menyembunyikan tombol pada template hanya membatasi tampilan, bukan akses API. Pengguna masih dapat mengirim request secara langsung melalui DevTools walaupun tombol tersebut disembunyikan.
+
+4. Ketika API menggunakan SessionAuthentication, browser pada origin yang sama dapat mengirim cookie session secara otomatis. Oleh karena itu, request yang mengubah data seperti POST, PUT, PATCH, dan DELETE tetap memerlukan token CSRF untuk melindungi pengguna dari serangan.
+
+Pengujian menggunakan force_authenticate() tidak cukuo untuk membuktikan perlindungan CSRF kerena method tersebut langsung menetapkan pengguna dalam pengujian tanpa menjalankan proses login dan pemeriksaan CSRF. Oleh karena itu, APIClient(enforce_csrf_checks=True) dan .login() digunakan untuk membuat session yang sebenernya. Pengujian pertama memastikan POST tanpa token CSRF menghasilkan 403 Forbidden, sedangkan pengujian kedua mengirim token CSRF yang valid dan memastikan POST berhasil dengan status 201 Created.
