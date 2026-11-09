@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import Project
+from main.models import Project, Education
 
 
 class ProjectAPITest(APITestCase):
@@ -136,3 +136,284 @@ class ProjectAPITest(APITestCase):
             self.list_url, self.payload, format="json", HTTP_X_CSRFTOKEN=token,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+class EducationAPITest(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_superuser(
+            username="owner", password="test-password", email="owner@example.com",
+        )
+        self.visitor = User.objects.create_user(
+            username="visitor", password="test-password",
+        )
+        self.editor = User.objects.create_user(
+            username="editor", password="test-password",
+        )
+
+        editor_group = Group.objects.create(name="Editor")
+        self.editor.groups.add(editor_group)
+
+        self.education = Education.objects.create(
+            title="Universitas Indonesia",
+            category="pendidikan",
+            start="2025-08-01",
+            end=None,
+        )
+
+        self.list_url = reverse("api:education-list")
+        self.detail_url = reverse("api:education-detail", args=[self.education.id])
+        self.star_url = reverse("api:education-star", args=[self.education.id])
+
+        self.payload = {
+            "title": "SMA Al-Azhar",
+            "category": "pendidikan",
+            "start": "2022-07-01",
+            "end": "2025-05-01",
+        }
+
+    def test_public_list_and_detail(self):
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["id"], str(self.education.id))
+        self.assertEqual(response.data[0]["title"], "Universitas Indonesia")
+        self.assertFalse(response.data[0]["is_starred"])
+        self.assertEqual(response.data[0]["star_count"], 0)
+        self.assertNotIn("fields", response.data[0])
+
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], str(self.education.id))
+
+    def test_missing_education(self):
+        url = reverse("api:education-detail", args=[uuid.uuid4()])
+        self.assertEqual(
+            self.client.get(url).status_code,
+            status.HTTP_404_NOT_FOUND
+        )
+
+    def test_guest_and_visitor_cannot_write(self):
+        for user in (None, self.visitor):
+            self.client.force_authenticate(user=user)
+
+            self.assertEqual(
+                self.client.post(self.list_url, self.payload, format="json").status_code,
+                status.HTTP_403_FORBIDDEN
+            )
+            self.assertEqual(
+                self.client.patch(self.detail_url, {"title": "Changed"}, format="json").status_code,
+                status.HTTP_403_FORBIDDEN
+            )
+            self.assertEqual(
+                self.client.delete(self.detail_url).status_code,
+                status.HTTP_403_FORBIDDEN
+            )
+
+            self.assertEqual(Education.objects.count(), 1)
+            self.education.refresh_from_db()
+            self.assertEqual(self.education.title, "Universitas Indonesia")
+
+    def test_editor_can_patch(self):
+        self.client.force_authenticate(user=self.editor)
+
+        response = self.client.patch(
+            self.detail_url, {"title": "Updated Education"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.title, "Updated Education")
+        self.assertEqual(str(self.education.start), "2025-08-01")
+
+    def test_editor_can_put(self):
+        self.client.force_authenticate(user=self.editor)
+
+        response = self.client.put(
+            self.detail_url, self.payload, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.title, "SMA Al-Azhar")
+        self.assertEqual(str(self.education.start), "2022-07-01")
+
+    def test_editor_cannot_create_or_delete(self):
+        self.client.force_authenticate(user=self.editor)
+
+        response = self.client.post(
+            self.list_url, self.payload, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Education.objects.count(), 1)
+
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.assertTrue(Education.objects.filter(pk=self.education.id).exists())
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.title, "Universitas Indonesia")
+
+    def test_owner_can_create(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.post(
+            self.list_url, self.payload, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Education.objects.filter(pk=response.data["id"]).exists()
+        )
+        self.assertEqual(Education.objects.count(), 2)
+
+    def test_owner_can_patch_put_and_delete(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.patch(
+            self.detail_url, {"title": "Changed"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.title, "Changed")
+        self.assertEqual(str(self.education.start), "2025-08-01")
+
+        response = self.client.put(
+            self.detail_url, {"title": "Incomplete"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.put(
+            self.detail_url, self.payload, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.title, "SMA Al-Azhar")
+
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(
+            Education.objects.filter(pk=self.education.id).exists()
+        )
+
+    def test_validation(self):
+        self.client.force_authenticate(user=self.owner)
+
+        for changes, field in [
+            ({"title": "   "}, "title"),
+            ({"title": '<img src="x" onerror="alert(1)">'}, "title"),
+            ({"category": "invalid"}, "category"),
+            ({"start": "invalid-date"}, "start"),
+            ({"end": "2025-13-01"}, "end"),
+        ]:
+            response = self.client.post(
+                self.list_url, {**self.payload, **changes}, format="json"
+            )
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn(field, response.data)
+
+        self.assertEqual(Education.objects.count(), 1)
+
+    def test_strip_tags(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.post(
+            self.list_url,
+            {**self.payload, "title": "<b>SMA Al-Azhar</b>"},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "SMA Al-Azhar")
+
+    def test_star_requires_login_and_toggles(self):
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(self.education.starred_by.count(), 0)
+
+        self.client.force_authenticate(user=self.visitor)
+
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 1)
+        self.assertTrue(
+            self.education.starred_by.filter(pk=self.visitor.pk).exists()
+        )
+
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 0)
+        self.assertFalse(
+            self.education.starred_by.filter(pk=self.visitor.pk).exists()
+        )
+
+    def test_is_starred_depends_on_user(self):
+        self.education.starred_by.add(self.owner)
+
+        self.client.force_authenticate(user=self.visitor)
+        response = self.client.get(self.detail_url)
+
+        self.assertEqual(response.data["star_count"], 1)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["starred_by_names"], "owner")
+
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.get(self.detail_url)
+
+        self.assertTrue(response.data["is_starred"])
+
+    def test_computed_fields_are_read_only(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.post(self.list_url, {
+            **self.payload,
+            "star_count": 99,
+            "is_starred": True,
+            "starred_by_names": "forged",
+            "starred_by": [self.visitor.id],
+        }, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["star_count"], 0)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["starred_by_names"], "")
+
+    def test_wrong_method(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.delete(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_session_write_without_csrf_is_rejected(self):
+        client = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(
+            client.login(username="owner", password="test-password")
+        )
+
+        response = client.post(
+            self.list_url, self.payload, format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Education.objects.count(), 1)
+
+    def test_session_write_with_csrf_succeeds(self):
+        client = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(
+            client.login(username="owner", password="test-password")
+        )
+
+        page = client.get(self.list_url, HTTP_ACCEPT="text/html")
+        self.assertEqual(page.status_code, status.HTTP_200_OK)
+
+        token = client.cookies["csrftoken"].value
+
+        response = client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+            HTTP_X_CSRFTOKEN=token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Education.objects.count(), 2)
